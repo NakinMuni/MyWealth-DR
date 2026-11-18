@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NexDR — Smart Screener & Sector Desk | By. NakinMuni</title>
+  <title>NexDR — Global Fair Value Terminal | By. NakinMuni</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -31,33 +31,41 @@
   <header class="sticky top-0 z-30 border-b border-slate-800/80 bg-slate-950/90 backdrop-blur-md">
     <div class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-2.5 px-4 py-3 sm:px-6">
       <div class="flex items-center gap-3">
-        <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400 to-teal-600 font-bold text-slate-950 shadow-lg shadow-emerald-500/20">
+        <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400 to-teal-600 text-lg font-extrabold text-slate-950 shadow-lg shadow-emerald-500/20">
           N
         </div>
         <div>
           <div class="flex flex-wrap items-center gap-2">
             <h1 class="text-base font-bold tracking-tight text-white sm:text-lg">NexDR</h1>
             <span class="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-400">
-              Smart Screener & Sector Desk
+              Fair Value Terminal
             </span>
             <span class="rounded-md border border-slate-700/80 bg-slate-900 px-2 py-0.5 text-[10px] font-medium tracking-wide text-slate-300">
               By. NakinMuni
             </span>
           </div>
-          <p class="hidden text-xs text-slate-400 sm:block">สแกน Fair Value • เช็กเวลาตลาดแม่ • วิเคราะห์สัดส่วน 15 หมวดธุรกิจ</p>
+          <p class="hidden text-xs text-slate-400 sm:block">สแกน Fair Value • จัดพอร์ต Core/Cash Flow/Alpha • คำนวณงบลงทุน & เป้าหมายส่วนตัว</p>
         </div>
       </div>
 
       <div class="flex flex-wrap items-center gap-2">
+        <button onclick="openAllocatorModal()" class="inline-flex items-center gap-1 rounded-lg border border-emerald-500/35 bg-emerald-500/10 px-2.5 py-1.5 text-xs font-semibold text-emerald-300 transition hover:bg-emerald-500/20">
+          <span>💰 จัดสรรเงินลงทุน</span>
+        </button>
+
+        <button onclick="openBackupModal()" class="inline-flex items-center gap-1 rounded-lg border border-slate-700 bg-slate-900 px-2.5 py-1.5 text-xs font-medium text-slate-300 transition hover:bg-slate-800 hover:text-white" title="สำรอง/กู้คืนข้อมูลพอร์ตและโน้ต">
+          <span>💾 สำรองข้อมูล</span>
+        </button>
+
         <button id="toggleQuickGuideBtn" onclick="toggleQuickGuide()" class="inline-flex items-center gap-1 rounded-lg border border-amber-500/30 bg-amber-500/10 px-2.5 py-1.5 text-xs font-medium text-amber-300 transition hover:bg-amber-500/20">
           <span>⚡ โพยย่อ</span>
         </button>
 
         <button onclick="openFullGuideModal()" class="inline-flex items-center gap-1 rounded-lg border border-slate-700 bg-slate-900 px-2.5 py-1.5 text-xs font-medium text-slate-300 transition hover:bg-slate-800 hover:text-white">
-          <span>📖 คู่มือละเอียด</span>
+          <span>📖 คู่มือ</span>
         </button>
 
-        <div id="statusBadge" class="hidden items-center gap-1.5 rounded-lg border border-slate-800 bg-slate-900 px-2.5 py-1.5 text-xs text-slate-400 md:flex">
+        <div id="statusBadge" class="hidden items-center gap-1.5 rounded-lg border border-slate-800 bg-slate-900 px-2.5 py-1.5 text-xs text-slate-400 lg:flex">
           <span id="statusDot" class="h-2 w-2 rounded-full bg-emerald-400"></span>
           <span id="lastUpdatedText">กำลังโหลด...</span>
         </div>
@@ -71,9 +79,9 @@
       </div>
     </div>
 
-    <!-- Live Market Session Bar -->
+    <!-- Live Market Session Bar + Dime! Happy Hour Alert -->
     <div class="border-t border-slate-800/70 bg-slate-900/75 px-4 py-1.5 sm:px-6">
-      <div id="marketClockBar" class="mx-auto flex max-w-7xl flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-slate-300"></div>
+      <div id="marketClockBar" class="mx-auto flex max-w-7xl flex-wrap items-center gap-x-3.5 gap-y-1 text-[11px] text-slate-300"></div>
     </div>
   </header>
 
@@ -84,7 +92,7 @@
       <div class="flex items-center justify-between gap-2 border-b border-slate-800/80 pb-2">
         <div class="flex items-center gap-2">
           <span class="flex h-5 w-5 items-center justify-center rounded-md bg-amber-500/20 text-xs text-amber-400">⚡</span>
-          <h2 class="text-xs font-bold text-amber-300">โพยสรุปใช้งานจริง (จังหวะดูหน้างาน)</h2>
+          <h2 class="text-xs font-bold text-amber-300">โพยสรุปใช้งานจริง (NexDR Workstation)</h2>
         </div>
         <div class="flex items-center gap-2">
           <button onclick="openFullGuideModal()" class="text-[11px] font-medium text-emerald-400 underline-offset-2 hover:underline">อ่านฉบับละเอียด →</button>
@@ -94,16 +102,16 @@
 
       <div class="mt-2.5 grid grid-cols-1 gap-2.5 text-xs sm:grid-cols-3">
         <div class="rounded-xl border border-slate-800/80 bg-slate-950/60 p-2.5">
-          <p class="font-semibold text-white">1. เช็กสถานะตลาดแม่ก่อนเคาะ</p>
-          <p class="mt-0.5 text-[11px] leading-relaxed text-slate-400"><span class="font-semibold text-emerald-400">🟢 ตลาดแม่วิ่งสด</span> = ราคาแม่ขยับจริงตามกระดาน • <span class="font-semibold text-indigo-300">🌙 ราคาปิดเมื่อคืน</span> = ตลาดแม่ปิดอยู่ ราคา DR ขยับตามค่าเงิน/Futures</p>
+          <p class="font-semibold text-white">1. แยกบทบาทพอร์ต & ตั้งเป้าส่วนตัว</p>
+          <p class="mt-0.5 text-[11px] leading-relaxed text-slate-400">จิ้มที่หุ้นเพื่อติดป้าย <span class="text-sky-300">🔵 Core</span> / <span class="text-purple-300">🟣 Cash Flow</span> / <span class="text-orange-300">🟠 Alpha</span> พร้อมตั้งราคาเป้าหมายส่วนตัว ถ้าราคาลงถึงเป้าการ์ดจะเด้งขึ้นบนสุด</p>
         </div>
         <div class="rounded-xl border border-slate-800/80 bg-slate-950/60 p-2.5">
-          <p class="font-semibold text-white">2. เช็กแถบสัดส่วน 15 หมวดธุรกิจ</p>
-          <p class="mt-0.5 text-[11px] leading-relaxed text-slate-400">ดูแถบสีในกลุ่มติดดาวเพื่อป้องกันพอร์ตกระจุกตัวในหมวดเดียวเกินไป และคลิกที่ป้ายหมวดเพื่อกรองหาตัว <span class="font-semibold text-emerald-400">🟢 น่าสะสม</span></p>
+          <p class="font-semibold text-white">2. คำนวณซื้อตามงบจริง & Happy Hour</p>
+          <p class="mt-0.5 text-[11px] leading-relaxed text-slate-400">กรอกงบเงินบาทในหน้าต่างหุ้นเพื่อดูจำนวนหน่วยที่ซื้อได้ (รวมเศษหุ้น Odd Lot) พร้อมคำนวณค่าคอมฯ 0% ช่วง <span class="text-amber-300">วันพุธ 15:00–16:00 น.</span></p>
         </div>
         <div class="rounded-xl border border-slate-800/80 bg-slate-950/60 p-2.5">
-          <p class="font-semibold text-white">3. ติดดาว (★) + อัปเดตสด 2 วินาที</p>
-          <p class="mt-0.5 text-[11px] leading-relaxed text-slate-400">กดปุ่มสีเขียว <span class="font-semibold text-emerald-400">อัปเดตสด (★)</span> เพื่อดึงราคาเฉพาะกลุ่มติดดาวทันที และจิ้มแถวเพื่อจำลองตั้ง Bid ตามเกณฑ์ Tick Size ใหม่</p>
+          <p class="font-semibold text-white">3. ปุ่มจัดสรรเงินปันผล / งบ DCA</p>
+          <p class="mt-0.5 text-[11px] leading-relaxed text-slate-400">กดปุ่ม <span class="font-semibold text-emerald-400">💰 จัดสรรเงินลงทุน</span> เพื่อนำเงินปันผลรายเดือนหรือเงินออม ไปสแกนหาตัวติดดาวที่กำลังลดราคาและคำนวณจำนวนหน่วยทันที</p>
         </div>
       </div>
     </section>
@@ -137,22 +145,30 @@
           <div class="flex items-center gap-2">
             <span class="text-base text-amber-400">★</span>
             <div>
-              <h2 class="text-sm font-bold text-white">กระดานตัวติดดาวของฉัน (<span id="watchlistHeaderCount">0</span> ตัว)</h2>
-              <p class="text-[11px] text-slate-400">วิเคราะห์สัดส่วน 15 หมวดธุรกิจ สถานะเปิด-ปิดตลาดแม่ และราคา Fair Value แบบเรียลไทม์</p>
+              <div class="flex flex-wrap items-center gap-2">
+                <h2 class="text-sm font-bold text-white">กระดานตัวติดดาวของฉัน (<span id="watchlistHeaderCount">0</span> ตัว)</h2>
+                <span id="targetHitCounterBadge" class="hidden rounded-full border border-amber-400/50 bg-amber-500/20 px-2 py-0.5 text-[10px] font-bold text-amber-300 animate-pulse"></span>
+              </div>
+              <p class="text-[11px] text-slate-400">เรียงตัวที่ถึงเป้าส่วนตัวขึ้นก่อน • คลิกการ์ดเพื่อตั้งเป้าหมาย แยกบทบาทพอร์ต และคำนวณงบซื้อ</p>
             </div>
           </div>
 
-          <button onclick="loadData(true)" id="watchlistSyncBtn" class="inline-flex items-center gap-1.5 rounded-lg border border-emerald-500/40 bg-emerald-500/15 px-3 py-1.5 text-xs font-semibold text-emerald-300 transition hover:bg-emerald-500/25 active:scale-95">
-            <span>⚡ อัปเดตราคาสดกลุ่มนี้</span>
-          </button>
+          <div class="flex flex-wrap items-center gap-2">
+            <button onclick="openAllocatorModal()" class="inline-flex items-center gap-1 rounded-lg border border-sky-500/40 bg-sky-500/15 px-3 py-1.5 text-xs font-semibold text-sky-300 transition hover:bg-sky-500/25 active:scale-95">
+              <span>💰 จัดสรรเงินปันผล / งบซื้อ</span>
+            </button>
+            <button onclick="loadData(true)" id="watchlistSyncBtn" class="inline-flex items-center gap-1.5 rounded-lg border border-emerald-500/40 bg-emerald-500/15 px-3 py-1.5 text-xs font-semibold text-emerald-300 transition hover:bg-emerald-500/25 active:scale-95">
+              <span>⚡ อัปเดตราคาสดกลุ่มนี้</span>
+            </button>
+          </div>
         </div>
 
-        <!-- แถบสรุปสัดส่วน 15 หมวดธุรกิจของกลุ่มติดดาว (Pure CSS Stacked Progress Bar) -->
+        <!-- แถบสรุปสัดส่วน 15 หมวดธุรกิจ + บทบาทพอร์ต ของกลุ่มติดดาว -->
         <div id="watchlistSectorBreakdown" class="mt-3.5 hidden rounded-xl border border-slate-800/90 bg-slate-950/75 p-3">
           <div class="flex flex-wrap items-center justify-between gap-2">
-            <div class="flex items-center gap-1.5">
+            <div class="flex flex-wrap items-center gap-2">
               <span class="text-xs font-semibold text-slate-200">📊 สัดส่วน 15 หมวดธุรกิจ (กลุ่มติดดาว)</span>
-              <span class="text-[10px] text-slate-500">• คลิกป้ายหมวดเพื่อกรองตารางด้านล่าง</span>
+              <span id="bucketSummaryInline" class="text-[10px] text-slate-400"></span>
             </div>
             <span id="sectorBalanceBadge" class="rounded-full px-2 py-0.5 text-[10px] font-semibold"></span>
           </div>
@@ -170,7 +186,7 @@
         <!-- กรณียังไม่มีตัวติดดาว -->
         <div id="watchlistEmptyPrompt" class="mt-3.5 rounded-xl border border-dashed border-slate-700 bg-slate-950/60 p-5 text-center">
           <p class="text-xs font-semibold text-slate-200">ยังไม่มีรายการติดดาวในพอร์ตของคุณ</p>
-          <p class="mt-1 text-[11px] text-slate-400">กดรูปดาว <span class="text-amber-400">☆</span> หน้าชื่อหุ้นในตารางด้านล่าง หรือเลือกจากตัวแนะนำด้านล่างนี้ เพื่อดูแถบสัดส่วน 15 หมวดธุรกิจ:</p>
+          <p class="mt-1 text-[11px] text-slate-400">กดรูปดาว <span class="text-amber-400">☆</span> หน้าชื่อหุ้นในตารางด้านล่าง หรือเลือกจากตัวแนะนำด้านล่างนี้:</p>
           <div id="quickStarChips" class="mt-3 flex flex-wrap justify-center gap-1.5"></div>
         </div>
       </section>
@@ -209,14 +225,14 @@
             </div>
 
             <div class="relative w-full sm:w-64">
-              <input id="searchInput" type="text" oninput="applyFilters()" placeholder="ค้นหา DR, หุ้นแม่, หมวดหมู่..." class="w-full rounded-lg border border-slate-700/80 bg-slate-950 py-1.5 pl-8 pr-3 text-xs text-white placeholder-slate-500 focus:border-emerald-500 focus:outline-none" />
+              <input id="searchInput" type="text" oninput="applyFilters()" placeholder="ค้นหา DR, หุ้นแม่, หมวดหมู่, โน้ต..." class="w-full rounded-lg border border-slate-700/80 bg-slate-950 py-1.5 pl-8 pr-3 text-xs text-white placeholder-slate-500 focus:border-emerald-500 focus:outline-none" />
               <svg class="absolute left-2.5 top-2 h-3.5 w-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 103.5 10.5a7.5 7.5 0 0013.15 6.15z" />
               </svg>
             </div>
           </div>
 
-          <!-- แถบกรองโซนราคา + หมวดหมู่ + ค่าย + ตลาด -->
+          <!-- แถบกรองโซนราคา + บทบาทพอร์ต + หมวดหมู่ + ค่าย + ตลาด -->
           <div class="flex flex-wrap items-center gap-2 border-t border-slate-800/60 pt-2.5">
             <span class="text-[11px] font-medium text-slate-400">โซนราคา:</span>
             <button onclick="setZoneFilter('ALL')" data-zone="ALL" class="zone-btn rounded-full border border-emerald-500/40 bg-emerald-500/20 px-2.5 py-0.5 text-[11px] font-medium text-emerald-300">ทั้งหมด</button>
@@ -225,6 +241,13 @@
             <button onclick="setZoneFilter('PREMIUM')" data-zone="PREMIUM" class="zone-btn rounded-full border border-slate-700 bg-slate-800/80 px-2.5 py-0.5 text-[11px] font-medium text-slate-300 hover:bg-slate-700">🔴 แพงกว่าแม่</button>
 
             <div class="ml-auto flex flex-wrap items-center gap-2">
+              <select id="bucketFilter" onchange="applyFilters()" class="rounded-lg border border-sky-500/40 bg-slate-950 px-2.5 py-1 text-[11px] font-medium text-sky-200 focus:border-emerald-500 focus:outline-none">
+                <option value="ALL">ทุกบทบาทพอร์ต</option>
+                <option value="CORE">🔵 แกนหลัก (Core)</option>
+                <option value="CASHFLOW">🟣 กระแสเงินสด (Cash Flow)</option>
+                <option value="ALPHA">🟠 แกนเสริม (Alpha)</option>
+                <option value="NONE">⚪ ยังไม่ระบุบทบาท</option>
+              </select>
               <select id="sectorFilter" onchange="applyFilters()" class="rounded-lg border border-indigo-500/40 bg-slate-950 px-2.5 py-1 text-[11px] font-medium text-indigo-200 focus:border-emerald-500 focus:outline-none">
                 <option value="ALL">ทุกหมวดหมู่ (15 กลุ่ม)</option>
               </select>
@@ -244,7 +267,7 @@
               <thead>
                 <tr class="border-b border-slate-800 bg-slate-950/80 text-[11px] uppercase tracking-wider text-slate-400">
                   <th class="w-10 px-3 py-3 text-center">★</th>
-                  <th class="cursor-pointer px-3 py-3 hover:text-white" onclick="sortBy('drSymbol')">DR / หมวดหมู่ / ตลาดแม่ ⇅</th>
+                  <th class="cursor-pointer px-3 py-3 hover:text-white" onclick="sortBy('drSymbol')">DR / บทบาท / หมวดหมู่ / ตลาดแม่ ⇅</th>
                   <th class="px-3 py-3 text-right">Ratio</th>
                   <th class="px-3 py-3 text-right">หุ้นแม่ (Parent)</th>
                   <th class="px-3 py-3 text-right">FX (THB)</th>
@@ -267,66 +290,198 @@
 
     <!-- Footer Signature -->
     <footer class="mt-8 border-t border-slate-800/70 pt-4 pb-6 flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-500">
-      <span>NexDR — Smart Screener & Sector Desk</span>
+      <span>NexDR — Cross-Market Fair Value & Personal Portfolio Workstation</span>
       <span class="font-medium text-slate-400">Designed & Engineered <strong class="text-emerald-400">By. NakinMuni</strong></span>
     </footer>
   </main>
 
-  <!-- Modal 1: เครื่องคิดเลขจำลองตั้ง Bid -->
-  <div id="calcModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/80 p-4 backdrop-blur-sm" onclick="if(event.target.id==='calcModal') hideModal('calcModal')">
-    <div class="w-full max-w-md rounded-2xl border border-slate-700/80 bg-slate-900 p-5 shadow-2xl">
-      <div class="flex items-start justify-between border-b border-slate-800 pb-3">
+  <!-- Modal 1: เครื่องคิดเลขจำลองตั้ง Bid + งบซื้อจริง + บทบาทพอร์ต + เป้าหมายส่วนตัว + โน้ต -->
+  <div id="calcModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/85 p-4 backdrop-blur-sm" onclick="if(event.target.id==='calcModal') hideModal('calcModal')">
+    <div class="flex max-h-[92vh] w-full max-w-lg flex-col rounded-2xl border border-slate-700/80 bg-slate-900 shadow-2xl">
+      <div class="flex items-start justify-between border-b border-slate-800 px-5 py-4">
         <div>
-          <div class="flex items-center gap-2">
+          <div class="flex flex-wrap items-center gap-2">
             <h3 id="modalTitle" class="text-base font-bold text-white">AAPL80</h3>
             <span id="modalMarket" class="rounded bg-slate-800 px-2 py-0.5 text-[11px] text-slate-300">NASDAQ</span>
           </div>
           <p id="modalSubtitle" class="mt-0.5 text-xs text-slate-400">Ratio 1:1,000 • Tick Size 0.05 ฿</p>
           <div id="modalSectors" class="mt-1.5 flex flex-wrap gap-1"></div>
         </div>
-        <button onclick="hideModal('calcModal')" class="rounded-lg p-1 text-slate-400 hover:bg-slate-800 hover:text-white">✕</button>
+        <button onclick="hideModal('calcModal')" class="rounded-lg p-1.5 text-slate-400 hover:bg-slate-800 hover:text-white">✕</button>
       </div>
 
-      <div class="mt-4 grid grid-cols-3 gap-2 rounded-xl bg-slate-950 p-3 text-center">
-        <div>
-          <p class="text-[11px] text-emerald-400">โซนตั้งรับ</p>
-          <p id="modalBuyTarget" class="mt-0.5 text-sm font-bold text-emerald-400 tabular-nums">-</p>
-        </div>
-        <div class="border-x border-slate-800">
-          <p class="text-[11px] text-slate-400">Fair Value</p>
-          <p id="modalFairPrice" class="mt-0.5 text-sm font-bold text-white tabular-nums">-</p>
-        </div>
-        <div>
-          <p class="text-[11px] text-slate-400">ราคา SET ล่าสุด</p>
-          <p id="modalSetPrice" class="mt-0.5 text-sm font-bold text-slate-200 tabular-nums">-</p>
-        </div>
-      </div>
-
-      <div class="mt-4 space-y-3">
-        <div>
-          <label class="block text-xs font-medium text-slate-300">ทดลองใส่ราคาที่ต้องการตั้ง Bid บนกระดาน (บาท)</label>
-          <div class="mt-1.5 flex items-center gap-2">
-            <button onclick="adjustSimPrice(-1)" class="rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-xs font-bold text-white hover:bg-slate-700">-1 Tick</button>
-            <input id="simPriceInput" type="number" step="0.01" oninput="updateSimResult()" class="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-center text-sm font-bold text-white tabular-nums focus:border-emerald-500 focus:outline-none" />
-            <button onclick="adjustSimPrice(1)" class="rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-xs font-bold text-white hover:bg-slate-700">+1 Tick</button>
+      <div class="space-y-4 overflow-y-auto px-5 py-4 text-xs">
+        <!-- แถบราคาหลัก 3 ช่อง -->
+        <div class="grid grid-cols-3 gap-2 rounded-xl bg-slate-950 p-3 text-center">
+          <div>
+            <p class="text-[11px] text-emerald-400">โซนตั้งรับ</p>
+            <p id="modalBuyTarget" class="mt-0.5 text-sm font-bold text-emerald-400 tabular-nums">-</p>
+          </div>
+          <div class="border-x border-slate-800">
+            <p class="text-[11px] text-slate-400">Fair Value</p>
+            <p id="modalFairPrice" class="mt-0.5 text-sm font-bold text-white tabular-nums">-</p>
+          </div>
+          <div>
+            <p class="text-[11px] text-slate-400">ราคา SET ล่าสุด</p>
+            <p id="modalSetPrice" class="mt-0.5 text-sm font-bold text-slate-200 tabular-nums">-</p>
           </div>
         </div>
 
-        <div class="rounded-xl border border-slate-800 bg-slate-950/70 p-3 text-xs">
+        <!-- ส่วนที่ 1: จำลองตั้ง Bid & คำนวณจำนวนหน่วยตามงบลงทุนจริง -->
+        <div class="rounded-xl border border-slate-800 bg-slate-950/60 p-3.5 space-y-3">
           <div class="flex items-center justify-between">
-            <span class="text-slate-400">ส่วนต่างเทียบ Fair Value จริง:</span>
-            <span id="simDiffBadge" class="font-bold tabular-nums">-</span>
+            <span class="font-bold text-white">1. จำลองตั้ง Bid & คำนวณจำนวนหน่วยตามงบจริง</span>
+            <label class="inline-flex cursor-pointer items-center gap-1.5 text-[11px] text-amber-300">
+              <input id="simHappyHourChk" type="checkbox" onchange="updateSimResult()" class="rounded border-slate-600 bg-slate-800 text-emerald-500 focus:ring-0" />
+              <span>ฟรีค่าคอมฯ 0% (Happy Hour)</span>
+            </label>
           </div>
-          <div class="mt-2 flex items-center justify-between border-t border-slate-800/80 pt-2">
-            <span class="text-slate-400">มูลค่าขั้นต่ำ 100 หน่วย (1 Board Lot):</span>
-            <span id="simLotCost" class="font-semibold text-slate-200 tabular-nums">-</span>
+
+          <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div>
+              <label class="block text-[11px] text-slate-400">ราคาตั้ง Bid บนกระดาน (บาท)</label>
+              <div class="mt-1 flex items-center gap-1.5">
+                <button onclick="adjustSimPrice(-1)" class="rounded-lg border border-slate-700 bg-slate-800 px-2.5 py-1.5 text-xs font-bold text-white hover:bg-slate-700">-1</button>
+                <input id="simPriceInput" type="number" step="0.01" oninput="updateSimResult()" class="w-full rounded-lg border border-slate-700 bg-slate-950 px-2 py-1.5 text-center text-sm font-bold text-white tabular-nums focus:border-emerald-500 focus:outline-none" />
+                <button onclick="adjustSimPrice(1)" class="rounded-lg border border-slate-700 bg-slate-800 px-2.5 py-1.5 text-xs font-bold text-white hover:bg-slate-700">+1</button>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-[11px] text-slate-400">งบลงทุนรอบนี้ (บาท)</label>
+              <div class="mt-1 flex items-center gap-1.5">
+                <input id="simBudgetInput" type="number" min="0" step="100" value="3000" oninput="updateSimResult()" class="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-1.5 text-center text-sm font-bold text-emerald-300 tabular-nums focus:border-emerald-500 focus:outline-none" />
+              </div>
+            </div>
+          </div>
+
+          <div class="rounded-lg border border-slate-800/90 bg-slate-900/90 p-2.5 space-y-1.5 text-[11px]">
+            <div class="flex items-center justify-between">
+              <span class="text-slate-400">ส่วนต่างเทียบ Fair Value จริง:</span>
+              <span id="simDiffBadge" class="font-bold tabular-nums">-</span>
+            </div>
+            <div class="flex items-center justify-between border-t border-slate-800/70 pt-1.5">
+              <span class="text-slate-400">จำนวนที่ซื้อได้ตามงบ (รวมเศษหุ้น Odd Lot):</span>
+              <span id="simUnitsResult" class="font-bold text-white tabular-nums">-</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-slate-400">มูลค่า 1 Board Lot (100 หน่วย):</span>
+              <span id="simLotCost" class="text-slate-300 tabular-nums">-</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ส่วนที่ 2: จัดบทบาทในพอร์ต + ราคาเป้าหมายส่วนตัว + สมุดโน้ต -->
+        <div class="rounded-xl border border-indigo-500/25 bg-indigo-950/10 p-3.5 space-y-3">
+          <p class="font-bold text-indigo-200">2. บันทึกแผนการลงทุนส่วนตัว (เก็บในเครื่องของคุณ)</p>
+
+          <div>
+            <label class="block text-[11px] text-slate-400 mb-1.5">บทบาทของหุ้นตัวนี้ในพอร์ต</label>
+            <div class="grid grid-cols-2 gap-1.5 sm:grid-cols-4">
+              <button type="button" onclick="selectModalBucket('CORE')" data-mbucket="CORE" class="mbucket-btn rounded-lg border border-slate-700 bg-slate-950 px-2 py-1.5 text-[11px] font-medium text-slate-300">🔵 แกนหลัก</button>
+              <button type="button" onclick="selectModalBucket('CASHFLOW')" data-mbucket="CASHFLOW" class="mbucket-btn rounded-lg border border-slate-700 bg-slate-950 px-2 py-1.5 text-[11px] font-medium text-slate-300">🟣 เงินสด</button>
+              <button type="button" onclick="selectModalBucket('ALPHA')" data-mbucket="ALPHA" class="mbucket-btn rounded-lg border border-slate-700 bg-slate-950 px-2 py-1.5 text-[11px] font-medium text-slate-300">🟠 แกนเสริม</button>
+              <button type="button" onclick="selectModalBucket('')" data-mbucket="" class="mbucket-btn rounded-lg border border-slate-700 bg-slate-950 px-2 py-1.5 text-[11px] font-medium text-slate-400">ไม่ระบุ</button>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div>
+              <label class="block text-[11px] text-slate-400">🎯 ราคาเป้าหมายส่วนตัว (บาท)</label>
+              <input id="modalCustomTargetInput" type="number" step="0.01" placeholder="เช่น 24.50 (เว้นว่างได้)" class="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-1.5 text-xs font-bold text-amber-300 placeholder-slate-600 tabular-nums focus:border-amber-400 focus:outline-none" />
+            </div>
+            <div>
+              <label class="block text-[11px] text-slate-400">📝 โน้ตสั้น / เงื่อนไขเข้าซื้อ-ขาย</label>
+              <input id="modalNoteInput" type="text" maxlength="100" placeholder="เช่น ถือยาว / รอ Discount > 1%" class="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-1.5 text-xs text-white placeholder-slate-600 focus:border-emerald-500 focus:outline-none" />
+            </div>
+          </div>
+
+          <div class="flex items-center justify-end gap-2 pt-1">
+            <button onclick="saveItemMetaFromModal()" class="rounded-lg bg-emerald-500 px-4 py-1.5 text-xs font-bold text-slate-950 shadow hover:brightness-110">
+              💾 บันทึกแผน & ติดดาวตัวนี้
+            </button>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Modal 2: คู่มือการใช้งานฉบับละเอียด -->
+  <!-- Modal 2: ตัวช่วยจัดสรรเงินปันผล / งบ DCA รายเดือน -->
+  <div id="allocatorModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/85 p-4 backdrop-blur-sm" onclick="if(event.target.id==='allocatorModal') hideModal('allocatorModal')">
+    <div class="flex max-h-[88vh] w-full max-w-2xl flex-col rounded-2xl border border-emerald-500/35 bg-slate-900 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-800 px-5 py-4">
+        <div>
+          <h3 class="text-base font-bold text-white">💰 ตัวช่วยจัดสรรเงินปันผล / งบลงทุนรายเดือน</h3>
+          <p class="mt-0.5 text-xs text-slate-400">สแกนเฉพาะตัวติดดาว (★) ที่กำลังอยู่โซนลดราคา หรือถึงเป้าส่วนตัว พร้อมคำนวณจำนวนหน่วย</p>
+        </div>
+        <button onclick="hideModal('allocatorModal')" class="rounded-lg p-1.5 text-slate-400 hover:bg-slate-800 hover:text-white">✕</button>
+      </div>
+
+      <div class="border-b border-slate-800 bg-slate-950/60 px-5 py-3.5">
+        <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
+          <div>
+            <label class="block text-[11px] text-slate-400">ยอดเงินที่พร้อมลงทุน (บาท)</label>
+            <input id="allocBudgetInput" type="number" min="100" step="100" value="3000" oninput="renderAllocatorResults()" class="mt-1 w-full rounded-lg border border-emerald-500/40 bg-slate-900 px-3 py-1.5 text-sm font-bold text-emerald-300 tabular-nums focus:outline-none" />
+          </div>
+          <div>
+            <label class="block text-[11px] text-slate-400">เลือกกลุ่มบทบาทในพอร์ต</label>
+            <select id="allocBucketSelect" onchange="renderAllocatorResults()" class="mt-1 w-full rounded-lg border border-slate-700 bg-slate-900 px-2.5 py-1.5 text-xs text-white focus:outline-none">
+              <option value="ALL">ทุกบทบาทในกลุ่มติดดาว</option>
+              <option value="CORE">🔵 เฉพาะแกนหลัก (Core)</option>
+              <option value="CASHFLOW">🟣 เฉพาะกระแสเงินสด (Cash Flow)</option>
+              <option value="ALPHA">🟠 เฉพาะแกนเสริม (Alpha)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[11px] text-slate-400">เงื่อนไขโซนราคา</label>
+            <select id="allocZoneSelect" onchange="renderAllocatorResults()" class="mt-1 w-full rounded-lg border border-slate-700 bg-slate-900 px-2.5 py-1.5 text-xs text-white focus:outline-none">
+              <option value="UNDERVALUED">🟢 น่าสะสม / 🎯 ถึงเป้าส่วนตัว</option>
+              <option value="FAIR_OR_BETTER">🟢 น่าสะสม + ⚪ ราคาเหมาะสม</option>
+              <option value="ALL">แสดงทุกตัวติดดาว (เรียงถูกไปแพง)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div id="allocatorResultBody" class="space-y-2.5 overflow-y-auto px-5 py-4 text-xs"></div>
+
+      <div class="flex items-center justify-between border-t border-slate-800 px-5 py-3 text-[11px] text-slate-400">
+        <span>เรียงลำดับจากตัวที่มีส่วนลด (Discount) มากที่สุดก่อน</span>
+        <button onclick="hideModal('allocatorModal')" class="rounded-lg bg-slate-800 px-4 py-1.5 font-semibold text-white hover:bg-slate-700">ปิดหน้าต่าง</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 3: สำรองข้อมูล / กู้คืนข้อมูล (Export / Import JSON) -->
+  <div id="backupModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/85 p-4 backdrop-blur-sm" onclick="if(event.target.id==='backupModal') hideModal('backupModal')">
+    <div class="w-full max-w-lg rounded-2xl border border-slate-700/80 bg-slate-900 p-5 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div>
+          <h3 class="text-base font-bold text-white">💾 สำรอง & กู้คืนข้อมูลส่วนตัว (NexDR Backup)</h3>
+          <p class="mt-0.5 text-xs text-slate-400">เก็บรักษา รายชื่อติดดาว บทบาทพอร์ต เป้าหมายส่วนตัว และโน้ตทั้งหมด</p>
+        </div>
+        <button onclick="hideModal('backupModal')" class="rounded-lg p-1.5 text-slate-400 hover:bg-slate-800 hover:text-white">✕</button>
+      </div>
+
+      <div class="mt-4 space-y-4 text-xs">
+        <div class="rounded-xl border border-slate-800 bg-slate-950/70 p-3.5">
+          <p class="font-semibold text-white">1. ส่งออกข้อมูลสำรอง (Export JSON)</p>
+          <p class="mt-1 text-[11px] text-slate-400">ดาวน์โหลดเป็นไฟล์ `.json` เก็บไว้ เผื่อล้างแคชเบราว์เซอร์หรือย้ายไปเปิดบนมือถือ/คอมเครื่องอื่น</p>
+          <button onclick="exportUserDataJson()" class="mt-2.5 rounded-lg bg-emerald-500 px-3.5 py-1.5 font-bold text-slate-950 hover:brightness-110">
+            ⬇️ ดาวน์โหลดไฟล์สำรอง (.json)
+          </button>
+        </div>
+
+        <div class="rounded-xl border border-slate-800 bg-slate-950/70 p-3.5">
+          <p class="font-semibold text-white">2. กู้คืนข้อมูลจากไฟล์ (Import JSON)</p>
+          <p class="mt-1 text-[11px] text-slate-400">เลือกไฟล์ `.json` ที่เคยสำรองไว้เพื่อนำข้อมูลทั้งหมดกลับมาทันที</p>
+          <input id="importJsonFileInput" type="file" accept=".json,application/json" onchange="importUserDataJson(event)" class="mt-2.5 block w-full text-[11px] text-slate-300 file:mr-3 file:rounded-lg file:border-0 file:bg-slate-800 file:px-3 file:py-1.5 file:font-semibold file:text-white hover:file:bg-slate-700" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 4: คู่มือการใช้งานฉบับละเอียด -->
   <div id="fullGuideModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/85 p-4 backdrop-blur-sm" onclick="if(event.target.id==='fullGuideModal') hideModal('fullGuideModal')">
     <div class="flex max-h-[88vh] w-full max-w-2xl flex-col rounded-2xl border border-slate-700/80 bg-slate-900 shadow-2xl">
       <div class="flex items-center justify-between border-b border-slate-800 px-5 py-4">
@@ -338,11 +493,9 @@
       </div>
 
       <div class="space-y-5 overflow-y-auto px-5 py-4 text-xs leading-relaxed text-slate-300">
-        
         <div class="rounded-xl border border-sky-500/25 bg-sky-950/15 p-4">
           <h4 class="text-sm font-bold text-sky-300">1. ตารางเวลาเปิด-ปิดตลาดเทียบเวลาไทย (GMT+7)</h4>
-          <p class="mt-1 text-slate-300">ระบบคำนวณเวลาเปิด-ปิดตลาดแต่ละประเทศอัตโนมัติ (รวมปรับเวลาออมแสง DST ของสหรัฐฯ/ยุโรปให้แล้ว):</p>
-          <div class="mt-2.5 overflow-hidden rounded-lg border border-slate-800">
+          <div class="mt-2 overflow-hidden rounded-lg border border-slate-800">
             <table class="w-full text-left text-[11px]">
               <thead class="bg-slate-900 text-slate-400">
                 <tr>
@@ -352,7 +505,7 @@
                 </tr>
               </thead>
               <tbody class="divide-y divide-slate-800/80 text-slate-300">
-                <tr><td class="px-3 py-1.5 font-semibold text-white">🇹🇭 SET (กระดาน DR)</td><td class="px-3 py-1.5">10:00–16:30 / 19:00–02:45</td><td class="px-3 py-1.5 text-slate-400">เทรดได้ทั้งกลางวันและกลางคืน</td></tr>
+                <tr><td class="px-3 py-1.5 font-semibold text-white">🇹🇭 SET (กระดาน DR)</td><td class="px-3 py-1.5">10:00–16:30 / 19:00–02:45</td><td class="px-3 py-1.5 text-amber-300">วันพุธ 15:00–16:00 น. มี Dime! Happy Hour 0%</td></tr>
                 <tr><td class="px-3 py-1.5 font-semibold text-white">🇭🇰 ฮ่องกง / 🇨🇳 จีน</td><td class="px-3 py-1.5">08:30–15:00 น.</td><td class="px-3 py-1.5 text-emerald-400">วิ่งสดพร้อมกระดานไทยช่วงกลางวัน</td></tr>
                 <tr><td class="px-3 py-1.5 font-semibold text-white">🇯🇵 ญี่ปุ่น (TSE)</td><td class="px-3 py-1.5">07:00–13:30 น.</td><td class="px-3 py-1.5 text-emerald-400">วิ่งสดพร้อมกระดานไทยช่วงเช้า-บ่ายต้น</td></tr>
                 <tr><td class="px-3 py-1.5 font-semibold text-white">🇪🇺 ยุโรป (Euronext)</td><td class="px-3 py-1.5">14:00/15:00–22:30/23:30 น.</td><td class="px-3 py-1.5 text-amber-300">เปิดช่วงบ่ายแก่ถึงรอบกลางคืน</td></tr>
@@ -363,11 +516,12 @@
         </div>
 
         <div class="rounded-xl border border-emerald-500/25 bg-emerald-950/15 p-4">
-          <h4 class="text-sm font-bold text-emerald-400">2. การจัดกลุ่มตาม 15 หมวดมาตรฐานโบรกเกอร์ & แถบสัดส่วนพอร์ต</h4>
-          <p class="mt-1 text-slate-300">ระบบคำนวณสัดส่วนเปอร์เซ็นต์ของหุ้นกลุ่มติดดาวให้อัตโนมัติ (หากหุ้น 1 ตัวมี 2 หมวด จะแบ่งน้ำหนักหมวดละ 0.5 เพื่อให้รวมครบ 100% พอดี) และแจ้งเตือนหากกระจุกตัวในหมวดเดียวเกิน 40%:</p>
-          <p class="mt-1.5 rounded-lg border border-slate-800 bg-slate-950/80 p-2.5 text-[11px] text-slate-300">
-            เทคโนโลยี • วัสดุพื้นฐาน • การสื่อสาร • สินค้าฟุ่มเฟือย • สินค้าจำเป็น • สุขภาพ • อุตสาหกรรม • อสังหาริมทรัพย์ • สาธารณูปโภค • ธุรกิจการเงิน • เกษตรและอุตสาหกรรมอาหาร • สินค้าอุปโภคบริโภค • ก่อสร้าง • ทรัพยากร • บริการ (และ ดัชนี / ETF)
-          </p>
+          <h4 class="text-sm font-bold text-emerald-400">2. การแบ่งพอร์ต 3 บทบาท & แถบสัดส่วน 15 หมวดธุรกิจ</h4>
+          <ul class="mt-1.5 list-disc space-y-1 pl-4 text-[11px] text-slate-300">
+            <li><strong class="text-sky-300">🔵 แกนหลัก (Core):</strong> หุ้น/ดัชนีพื้นฐานแกร่งสำหรับถือยาวสร้างการเติบโตทบต้น</li>
+            <li><strong class="text-purple-300">🟣 กระแสเงินสด (Cash Flow):</strong> กลุ่มปันผลสม่ำเสมอหรือสาธารณูปโภค สำหรับผลิตกระแสเงินสดหมุนกลับ</li>
+            <li><strong class="text-orange-300">🟠 แกนเสริม (Alpha):</strong> หุ้นเติบโตสูงหรือเก็งรอบตามวัฏจักรที่จำกัดสัดส่วนความเสี่ยง</li>
+          </ul>
         </div>
 
         <div class="rounded-xl border border-slate-800 bg-slate-950/70 p-4">
@@ -408,12 +562,45 @@
     let zoneFilter = 'ALL';
     let sortConfig = { key: 'drSymbol', asc: true };
     let selectedModalItem = null;
+    let selectedModalBucket = '';
 
     const WATCHLIST_KEY = 'mywealth_watchlist_v1';
+    const USER_META_KEY = 'nexdr_user_meta_v1';
     const QUICK_GUIDE_KEY = 'mywealth_quick_guide_visible_v1';
-    let watchlist = new Set(JSON.parse(localStorage.getItem(WATCHLIST_KEY) || '[]'));
 
-    // 15 หมวดมาตรฐานตามโบรกเกอร์ (สไตล์ป้าย + สีแท่งกราฟ + จุดสี)
+    let watchlist = new Set(JSON.parse(localStorage.getItem(WATCHLIST_KEY) || '[]'));
+    // userMeta[symbol] = { bucket: 'CORE'|'CASHFLOW'|'ALPHA'|'', targetPrice: number|null, note: string }
+    let userMeta = JSON.parse(localStorage.getItem(USER_META_KEY) || '{}');
+
+    function saveUserMeta() {
+      localStorage.setItem(USER_META_KEY, JSON.stringify(userMeta));
+    }
+
+    function getItemMeta(symbol) {
+      return userMeta[symbol] || { bucket: '', targetPrice: null, note: '' };
+    }
+
+    function escapeHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    const BUCKET_BADGES = {
+      'CORE': { label: '🔵 แกนหลัก', cls: 'border-sky-500/35 bg-sky-500/15 text-sky-300' },
+      'CASHFLOW': { label: '🟣 เงินสด', cls: 'border-purple-500/35 bg-purple-500/15 text-purple-300' },
+      'ALPHA': { label: '🟠 แกนเสริม', cls: 'border-orange-500/35 bg-orange-500/15 text-orange-300' }
+    };
+
+    function renderBucketBadge(bucket) {
+      const b = BUCKET_BADGES[bucket];
+      if (!b) return '';
+      return `<span class="inline-block rounded border px-1.5 py-0.5 text-[10px] font-semibold ${b.cls}">${b.label}</span>`;
+    }
+
+    // 15 หมวดมาตรฐานตามโบรกเกอร์
     const SECTOR_THEME = {
       'เทคโนโลยี': { pill: 'border-cyan-500/30 bg-cyan-500/15 text-cyan-300', bar: 'bg-cyan-400', dot: 'bg-cyan-400' },
       'วัสดุพื้นฐาน': { pill: 'border-stone-500/30 bg-stone-500/15 text-stone-300', bar: 'bg-stone-400', dot: 'bg-stone-400' },
@@ -445,18 +632,26 @@
       const list = Array.isArray(sectors) && sectors.length > 0 ? sectors : ['อื่นๆ'];
       return list.map(sec => {
         const theme = getSectorTheme(sec);
-        return `<span class="inline-block rounded border px-1.5 py-0.5 text-[10px] font-medium ${theme.pill}">${sec}</span>`;
+        return `<span class="inline-block rounded border px-1.5 py-0.5 text-[10px] font-medium ${theme.pill}">${escapeHtml(sec)}</span>`;
       }).join(' ');
     }
 
+    function isTargetHit(item) {
+      const meta = getItemMeta(item.drSymbol);
+      const setP = Number(item.setPrice) || 0;
+      const targetP = Number(meta.targetPrice) || 0;
+      return setP > 0 && targetP > 0 && setP <= targetP;
+    }
+
     // ==========================================
-    // คำนวณและวาดแถบสัดส่วน "15 หมวดธุรกิจ" ของกลุ่มติดดาว (Pure CSS)
+    // แถบสัดส่วน 15 หมวดธุรกิจ + บทบาทพอร์ต
     // ==========================================
     function renderWatchlistSectorBreakdown(starredItems) {
       const container = document.getElementById('watchlistSectorBreakdown');
       const barEl = document.getElementById('sectorStackedBar');
       const pillsEl = document.getElementById('sectorLegendPills');
       const badgeEl = document.getElementById('sectorBalanceBadge');
+      const bucketInlineEl = document.getElementById('bucketSummaryInline');
 
       if (!starredItems || starredItems.length === 0) {
         container.classList.add('hidden');
@@ -465,12 +660,15 @@
 
       container.classList.remove('hidden');
 
-      // แบ่งน้ำหนักเท่าๆ กันต่อหุ้น 1 ตัว (หากมี 2 หมวด จะได้หมวดละ 0.5 เพื่อให้ผลรวมเท่ากับ 100% พอดี)
       const sectorWeights = {};
       const sectorCounts = {};
+      const bucketCounts = { CORE: 0, CASHFLOW: 0, ALPHA: 0 };
       const totalStocks = starredItems.length;
 
       starredItems.forEach(item => {
+        const meta = getItemMeta(item.drSymbol);
+        if (bucketCounts[meta.bucket] !== undefined) bucketCounts[meta.bucket]++;
+
         const secs = (Array.isArray(item.sectors) && item.sectors.length > 0) ? item.sectors : ['อื่นๆ'];
         const weightPerSec = 1 / secs.length;
         secs.forEach(sec => {
@@ -479,16 +677,16 @@
         });
       });
 
+      bucketInlineEl.innerHTML = `• 🔵 Core: <strong class="text-sky-300">${bucketCounts.CORE}</strong> | 🟣 Cash Flow: <strong class="text-purple-300">${bucketCounts.CASHFLOW}</strong> | 🟠 Alpha: <strong class="text-orange-300">${bucketCounts.ALPHA}</strong>`;
+
       const breakdown = Object.keys(sectorWeights)
         .map(sec => ({
           name: sec,
-          weight: sectorWeights[sec],
           pct: (sectorWeights[sec] / totalStocks) * 100,
           count: sectorCounts[sec]
         }))
         .sort((a, b) => b.pct - a.pct);
 
-      // ป้ายประเมินการกระจายความเสี่ยง
       const topSector = breakdown[0];
       if (totalStocks >= 3 && topSector && topSector.pct > 40) {
         badgeEl.className = 'rounded-full border border-amber-500/40 bg-amber-500/15 px-2.5 py-0.5 text-[10px] font-semibold text-amber-300';
@@ -501,19 +699,17 @@
         badgeEl.textContent = `${breakdown.length} หมวดธุรกิจ`;
       }
 
-      // 1. วาดแถบสีแนวนอน (Stacked Bar)
       barEl.innerHTML = breakdown.map(b => {
         const theme = getSectorTheme(b.name);
         return `<div style="width: ${b.pct.toFixed(2)}%" title="${b.name}: ${b.pct.toFixed(1)}% (${b.count} ตัว)" class="h-full first:rounded-l-full last:rounded-r-full transition-all duration-300 ${theme.bar}"></div>`;
       }).join('');
 
-      // 2. วาดป้าย Legend ด้านล่าง (คลิกเพื่อกรองตารางตามหมวดได้ทันที)
       pillsEl.innerHTML = breakdown.map(b => {
         const theme = getSectorTheme(b.name);
         return `
-          <button onclick="quickFilterBySector('${b.name}')" class="inline-flex items-center gap-1.5 rounded-lg border border-slate-800 bg-slate-900/90 px-2 py-1 text-[11px] transition hover:border-slate-600 hover:bg-slate-800" title="คลิกเพื่อกรองหมวด ${b.name} ในตาราง">
+          <button onclick="quickFilterBySector('${b.name}')" class="inline-flex items-center gap-1.5 rounded-lg border border-slate-800 bg-slate-900/90 px-2 py-1 text-[11px] transition hover:border-slate-600 hover:bg-slate-800">
             <span class="h-2 w-2 rounded-full ${theme.dot}"></span>
-            <span class="font-medium text-slate-200">${b.name}</span>
+            <span class="font-medium text-slate-200">${escapeHtml(b.name)}</span>
             <span class="font-bold text-white tabular-nums">${b.pct.toFixed(1)}%</span>
             <span class="text-[10px] text-slate-400">(${b.count})</span>
           </button>
@@ -532,7 +728,7 @@
     }
 
     // ==========================================
-    // ระบบคำนวณเวลาเปิด-ปิดตลาดตาม Timezone จริง
+    // ระบบเวลาเปิด-ปิดตลาด + Dime! Happy Hour (วันพุธ 15:00-16:00 น.)
     // ==========================================
     function getLocalTimeParts(timeZone) {
       const parts = new Intl.DateTimeFormat('en-US', {
@@ -551,6 +747,21 @@
         weekday: map.weekday,
         minutesOfDay: hour * 60 + minute
       };
+    }
+
+    function getDimeHappyHourStatus() {
+      const t = getLocalTimeParts('Asia/Bangkok');
+      const m = t.minutesOfDay;
+      if (t.weekday === 'Wed') {
+        if (m >= 15 * 60 && m < 16 * 60) {
+          const leftMin = 16 * 60 - m;
+          return { isActive: true, badgeHtml: `<span class="rounded-full border border-amber-400/50 bg-amber-500/20 px-2 py-0.5 font-bold text-amber-300">🎉 Dime! Happy Hour: ฟรีค่าคอมฯ 0% (เหลือ ${leftMin} นาที)</span>` };
+        }
+        if (m < 15 * 60) {
+          return { isActive: false, badgeHtml: `<span class="text-amber-300/90">⏰ Dime! Happy Hour วันนี้ 15:00–16:00 น.</span>` };
+        }
+      }
+      return { isActive: false, badgeHtml: '' };
     }
 
     function getSetDrSessionStatus() {
@@ -599,7 +810,6 @@
           ? { state: 'OPEN', shortBadge: '🟢 แม่วิ่งสด', color: 'text-emerald-400', thaiHours: '20:30/21:30–03:00/04:00' }
           : { state: 'CLOSED', shortBadge: '🌙 ราคาปิดเมื่อคืน', color: 'text-indigo-300', thaiHours: 'เปิด 20:30/21:30 น.' };
       }
-
       if (m.includes('HK') || m.includes('HONG') || c === 'HKD') {
         const st = checkSessionOpen('Asia/Hong_Kong', [
           { start: 9 * 60 + 30, end: 12 * 60, state: 'OPEN' },
@@ -610,7 +820,6 @@
         if (st === 'LUNCH') return { state: 'LUNCH', shortBadge: '⏸️ พักเที่ยง', color: 'text-amber-300', thaiHours: 'เปิดบ่าย 12:00 น.' };
         return { state: 'CLOSED', shortBadge: '🌙 ตลาดแม่ปิด', color: 'text-slate-400', thaiHours: '08:30–15:00 น.' };
       }
-
       if (m.includes('SHANGHAI') || m.includes('SHENZHEN') || m.includes('SSE') || m.includes('SZSE') || m.includes('CHINA') || c === 'CNY' || c === 'CNH') {
         const st = checkSessionOpen('Asia/Shanghai', [
           { start: 9 * 60 + 30, end: 11 * 60 + 30, state: 'OPEN' },
@@ -621,7 +830,6 @@
         if (st === 'LUNCH') return { state: 'LUNCH', shortBadge: '⏸️ พักเที่ยง', color: 'text-amber-300', thaiHours: 'เปิดบ่าย 12:00 น.' };
         return { state: 'CLOSED', shortBadge: '🌙 ตลาดแม่ปิด', color: 'text-slate-400', thaiHours: '08:30–14:00 น.' };
       }
-
       if (m.includes('TOKYO') || m.includes('TSE') || m.includes('TYO') || m.includes('JAPAN') || c === 'JPY') {
         const st = checkSessionOpen('Asia/Tokyo', [
           { start: 9 * 60, end: 11 * 60 + 30, state: 'OPEN' },
@@ -632,28 +840,24 @@
         if (st === 'LUNCH') return { state: 'LUNCH', shortBadge: '⏸️ พักเที่ยง', color: 'text-amber-300', thaiHours: 'เปิดบ่าย 10:30 น.' };
         return { state: 'CLOSED', shortBadge: '🌙 ตลาดแม่ปิด', color: 'text-slate-400', thaiHours: '07:00–13:30 น.' };
       }
-
       if (m.includes('EURONEXT') || m.includes('PARIS') || m.includes('AMSTERDAM') || m.includes('XETRA') || m.includes('EUROPE') || c === 'EUR') {
         const st = checkSessionOpen('Europe/Paris', [{ start: 9 * 60, end: 17 * 60 + 30, state: 'OPEN' }]);
         return st === 'OPEN'
           ? { state: 'OPEN', shortBadge: '🟢 แม่วิ่งสด', color: 'text-emerald-400', thaiHours: '14:00/15:00–22:30/23:30' }
           : { state: 'CLOSED', shortBadge: '🌙 ตลาดแม่ปิด', color: 'text-indigo-300', thaiHours: 'เปิด 14:00/15:00 น.' };
       }
-
       if (m.includes('LSE') || m.includes('LONDON') || c === 'GBP') {
         const st = checkSessionOpen('Europe/London', [{ start: 8 * 60, end: 16 * 60 + 30, state: 'OPEN' }]);
         return st === 'OPEN'
           ? { state: 'OPEN', shortBadge: '🟢 แม่วิ่งสด', color: 'text-emerald-400', thaiHours: '14:00/15:00–22:30/23:30' }
           : { state: 'CLOSED', shortBadge: '🌙 ตลาดแม่ปิด', color: 'text-indigo-300', thaiHours: 'เปิด 14:00/15:00 น.' };
       }
-
       if (m.includes('SGX') || m.includes('SINGAPORE') || c === 'SGD') {
         const st = checkSessionOpen('Asia/Singapore', [{ start: 9 * 60, end: 17 * 60, state: 'OPEN' }]);
         return st === 'OPEN'
           ? { state: 'OPEN', shortBadge: '🟢 แม่วิ่งสด', color: 'text-emerald-400', thaiHours: '08:00–16:00 น.' }
           : { state: 'CLOSED', shortBadge: '🌙 ตลาดแม่ปิด', color: 'text-slate-400', thaiHours: '08:00–16:00 น.' };
       }
-
       if (m.includes('HOSE') || m.includes('VIETNAM') || c === 'VND') {
         const st = checkSessionOpen('Asia/Ho_Chi_Minh', [
           { start: 9 * 60, end: 11 * 60 + 30, state: 'OPEN' },
@@ -664,19 +868,18 @@
         if (st === 'LUNCH') return { state: 'LUNCH', shortBadge: '⏸️ พักเที่ยง', color: 'text-amber-300', thaiHours: 'เปิดบ่าย 13:00 น.' };
         return { state: 'CLOSED', shortBadge: '🌙 ตลาดแม่ปิด', color: 'text-slate-400', thaiHours: '09:00–14:45 น.' };
       }
-
       if (m.includes('TWSE') || m.includes('TAIWAN') || c === 'TWD') {
         const st = checkSessionOpen('Asia/Taipei', [{ start: 9 * 60, end: 13 * 60 + 30, state: 'OPEN' }]);
         return st === 'OPEN'
           ? { state: 'OPEN', shortBadge: '🟢 แม่วิ่งสด', color: 'text-emerald-400', thaiHours: '08:00–12:30 น.' }
           : { state: 'CLOSED', shortBadge: '🌙 ตลาดแม่ปิด', color: 'text-slate-400', thaiHours: '08:00–12:30 น.' };
       }
-
       return { state: 'UNKNOWN', shortBadge: '', color: 'text-slate-400', thaiHours: '' };
     }
 
     function updateMarketClockBar() {
       const setSt = getSetDrSessionStatus();
+      const dimeSt = getDimeHappyHourStatus();
       const hkSt = getParentMarketStatus('HKEX', 'HKD');
       const cnSt = getParentMarketStatus('SSE', 'CNY');
       const euSt = getParentMarketStatus('Euronext', 'EUR');
@@ -685,6 +888,7 @@
       const bar = document.getElementById('marketClockBar');
       bar.innerHTML = `
         <span class="font-semibold ${setSt.isOpen ? 'text-emerald-400' : 'text-slate-400'}">${setSt.label}</span>
+        ${dimeSt.badgeHtml ? `<span class="text-slate-700">|</span> ${dimeSt.badgeHtml}` : ''}
         <span class="text-slate-700">|</span>
         <span>🇭🇰 ฮ่องกง: <strong class="${hkSt.color}">${hkSt.shortBadge}</strong></span>
         <span>🇨🇳 จีน: <strong class="${cnSt.color}">${cnSt.shortBadge}</strong></span>
@@ -780,10 +984,28 @@
       const grid = document.getElementById('watchlistCardsGrid');
       const emptyPrompt = document.getElementById('watchlistEmptyPrompt');
       const syncBtn = document.getElementById('watchlistSyncBtn');
+      const targetHitBadge = document.getElementById('targetHitCounterBadge');
 
       const starredItems = allItems.filter(it => watchlist.has(it.drSymbol));
 
-      // อัปเดตแถบสัดส่วน 15 หมวดธุรกิจของกลุ่มติดดาว
+      // เรียงตัวที่ถึงราคาเป้าหมายส่วนตัวขึ้นบนสุด ตามด้วยตัวที่ Discount ลึกสุด
+      starredItems.sort((a, b) => {
+        const hitA = isTargetHit(a) ? 0 : 1;
+        const hitB = isTargetHit(b) ? 0 : 1;
+        if (hitA !== hitB) return hitA - hitB;
+        const diffA = a.diffPct !== null ? Number(a.diffPct) : 999;
+        const diffB = b.diffPct !== null ? Number(b.diffPct) : 999;
+        return diffA - diffB;
+      });
+
+      const hitCount = starredItems.filter(isTargetHit).length;
+      if (hitCount > 0) {
+        targetHitBadge.classList.remove('hidden');
+        targetHitBadge.textContent = `🎯 ถึงเป้าส่วนตัว ${hitCount} ตัว!`;
+      } else {
+        targetHitBadge.classList.add('hidden');
+      }
+
       renderWatchlistSectorBreakdown(starredItems);
 
       if (starredItems.length === 0) {
@@ -792,7 +1014,7 @@
         emptyPrompt.classList.remove('hidden');
         syncBtn.classList.add('hidden');
 
-        const suggestions = ['GOOG80', 'AAPL80', 'NVDA80', 'KO80', 'PEP80', 'PNG80', 'MA80', 'SPHLTH80']
+        const suggestions = ['GOOG80', 'AAPL80', 'NVDA80', 'KO80', 'JEPI19', 'PNG80', 'MA80', 'SPHLTH80']
           .filter(sym => allItems.some(it => it.drSymbol === sym));
         const chipsBox = document.getElementById('quickStarChips');
         chipsBox.innerHTML = suggestions.map(sym => `
@@ -809,6 +1031,8 @@
 
       grid.innerHTML = starredItems.map(item => {
         const status = getZoneStatus(item);
+        const meta = getItemMeta(item.drSymbol);
+        const hit = isTargetHit(item);
         const mktStatus = getParentMarketStatus(item.market, item.currency);
         const setP = Number(item.setPrice) || 0;
         const fairP = Number(item.fairPrice) || 0;
@@ -818,7 +1042,11 @@
 
         let borderClass = 'border-slate-800 bg-slate-950/80';
         let statusTag = '<span class="rounded-full bg-slate-800 px-2 py-0.5 text-[10px] text-slate-400">รอราคา SET</span>';
-        if (status === 'DISCOUNT') {
+
+        if (hit) {
+          borderClass = 'border-amber-400/70 bg-amber-950/20 shadow-lg shadow-amber-500/10';
+          statusTag = '<span class="rounded-full border border-amber-400/50 bg-amber-500/25 px-2 py-0.5 text-[10px] font-bold text-amber-200">🎯 ถึงเป้าส่วนตัว</span>';
+        } else if (status === 'DISCOUNT') {
           borderClass = 'border-emerald-500/40 bg-emerald-950/15';
           statusTag = '<span class="rounded-full border border-emerald-500/30 bg-emerald-500/20 px-2 py-0.5 text-[10px] font-bold text-emerald-300">🟢 น่าสะสม</span>';
         } else if (status === 'FAIR') {
@@ -837,6 +1065,14 @@
           diffBadge = `<span class="font-bold tabular-nums ${color}">${sign}${d.toFixed(2)}%</span>`;
         }
 
+        const customTargetText = meta.targetPrice
+          ? `<span class="text-amber-300">🎯 เป้า: ≤ ${formatPrice(meta.targetPrice, item.tickSize)}</span>`
+          : '';
+
+        const noteHtml = meta.note
+          ? `<div class="mt-2 truncate rounded-md border border-slate-800/80 bg-slate-900/70 px-2 py-1 text-[10px] text-slate-300" title="${escapeHtml(meta.note)}">📝 ${escapeHtml(meta.note)}</div>`
+          : '';
+
         return `
           <div onclick="openModalBySymbol('${item.drSymbol}')" class="cursor-pointer rounded-xl border ${borderClass} p-3.5 transition hover:border-amber-400/50 hover:bg-slate-900">
             <div class="flex items-start justify-between gap-2">
@@ -845,7 +1081,7 @@
                 <div>
                   <div class="flex flex-wrap items-center gap-1.5">
                     <span class="text-sm font-bold text-white">${item.drSymbol}</span>
-                    <span class="rounded bg-slate-800 px-1.5 py-0.5 text-[10px] text-slate-400">${item.parentTicker}</span>
+                    ${renderBucketBadge(meta.bucket)}
                     <span class="text-[10px] font-medium ${mktStatus.color}">${mktStatus.shortBadge}</span>
                   </div>
                   <div class="mt-1 flex flex-wrap items-center gap-1">
@@ -871,10 +1107,14 @@
               </div>
             </div>
 
-            <div class="mt-2.5 flex items-center justify-between text-[11px]">
+            <div class="mt-2.5 flex flex-wrap items-center justify-between gap-1 text-[11px]">
               <span class="text-slate-400">แม่: <strong class="text-slate-200 tabular-nums">${parentP > 0 ? parentP.toFixed(2) : '-'}</strong> ${item.currency} <span class="${chg >= 0 ? 'text-emerald-400' : 'text-rose-400'}">(${chg >= 0 ? '+' : ''}${chg.toFixed(2)}%)</span></span>
-              <span>ส่วนต่าง: ${diffBadge}</span>
+              <div class="flex items-center gap-2">
+                ${customTargetText}
+                <span>ส่วนต่าง: ${diffBadge}</span>
+              </div>
             </div>
+            ${noteHtml}
           </div>
         `;
       }).join('');
@@ -939,6 +1179,7 @@
 
     function applyFilters() {
       const q = document.getElementById('searchInput').value.trim().toLowerCase();
+      const bucketVal = document.getElementById('bucketFilter').value;
       const sectorVal = document.getElementById('sectorFilter').value;
       const issuerVal = document.getElementById('issuerFilter').value;
       const marketVal = document.getElementById('marketFilter').value;
@@ -947,6 +1188,12 @@
         if (activeTab === 'watchlist' && !watchlist.has(item.drSymbol)) return false;
         if (issuerVal !== 'ALL' && item.issuer !== issuerVal) return false;
         if (marketVal !== 'ALL' && item.market !== marketVal) return false;
+
+        const meta = getItemMeta(item.drSymbol);
+        if (bucketVal !== 'ALL') {
+          if (bucketVal === 'NONE' && meta.bucket !== '') return false;
+          if (bucketVal !== 'NONE' && meta.bucket !== bucketVal) return false;
+        }
 
         if (sectorVal !== 'ALL') {
           const itemSectors = Array.isArray(item.sectors) ? item.sectors : [];
@@ -957,7 +1204,7 @@
         if (zoneFilter !== 'ALL' && status !== zoneFilter) return false;
 
         if (q) {
-          const hay = `${item.drSymbol} ${item.parentTicker} ${item.market} ${item.currency} ${item.sectorText || ''}`.toLowerCase();
+          const hay = `${item.drSymbol} ${item.parentTicker} ${item.market} ${item.currency} ${item.sectorText || ''} ${meta.note || ''}`.toLowerCase();
           if (!hay.includes(q)) return false;
         }
         return true;
@@ -990,6 +1237,8 @@
 
       tbody.innerHTML = items.map(item => {
         const isStarred = watchlist.has(item.drSymbol);
+        const meta = getItemMeta(item.drSymbol);
+        const hit = isTargetHit(item);
         const status = getZoneStatus(item);
         const mktStatus = getParentMarketStatus(item.market, item.currency);
         const parentP = Number(item.parentPrice) || 0;
@@ -1002,7 +1251,9 @@
         const tick = Number(item.tickSize) || 0.01;
 
         let badgeHtml = '<span class="rounded-full bg-slate-800 px-2 py-0.5 text-[10px] text-slate-400">รอราคา SET</span>';
-        if (status === 'DISCOUNT') {
+        if (hit) {
+          badgeHtml = '<span class="rounded-full border border-amber-400/50 bg-amber-500/20 px-2 py-0.5 text-[10px] font-bold text-amber-300">🎯 ถึงเป้า</span>';
+        } else if (status === 'DISCOUNT') {
           badgeHtml = '<span class="rounded-full border border-emerald-500/30 bg-emerald-500/15 px-2 py-0.5 text-[10px] font-semibold text-emerald-400">🟢 น่าสะสม</span>';
         } else if (status === 'FAIR') {
           badgeHtml = '<span class="rounded-full border border-slate-600/50 bg-slate-800 px-2 py-0.5 text-[10px] font-medium text-slate-200">⚪ เหมาะสม</span>';
@@ -1031,6 +1282,7 @@
             <td class="px-3 py-3">
               <div class="flex flex-wrap items-center gap-1.5">
                 <span class="font-bold text-white">${item.drSymbol}</span>
+                ${renderBucketBadge(meta.bucket)}
                 <span class="rounded bg-slate-800 px-1.5 py-0.5 text-[10px] text-slate-400">${item.market}</span>
                 <span class="text-[10px] font-medium ${mktStatus.color}">${mktStatus.shortBadge}</span>
               </div>
@@ -1062,14 +1314,17 @@
       }).join('');
     }
 
+    // ==========================================
+    // Modal 1: จำลองตั้ง Bid + งบซื้อจริง + บทบาท + เป้าหมาย + โน้ต
+    // ==========================================
     function openModalBySymbol(symbol) {
       const item = allItems.find(it => it.drSymbol === symbol);
       if (!item) return;
       selectedModalItem = item;
+      const meta = getItemMeta(symbol);
 
       const mktStatus = getParentMarketStatus(item.market, item.currency);
       const tick = Number(item.tickSize) || 0.01;
-      const fx = Number(item.fxRate) || 0;
       const buyT = Number(item.buyTarget) || 0;
       const fairP = Number(item.fairPrice) || 0;
       const setP = Number(item.setPrice) || 0;
@@ -1082,9 +1337,17 @@
       document.getElementById('modalFairPrice').textContent = fairP > 0 ? formatPrice(fairP, tick) + ' ฿' : '-';
       document.getElementById('modalSetPrice').textContent = setP > 0 ? formatPrice(setP, tick) + ' ฿' : 'รอเปิดตลาด';
 
-      const defaultBid = buyT || fairP || 0;
+      // ตั้งค่าเริ่มต้น Happy Hour ตามเวลาปัจจุบัน
+      document.getElementById('simHappyHourChk').checked = getDimeHappyHourStatus().isActive;
+
+      const defaultBid = setP || buyT || fairP || 0;
       document.getElementById('simPriceInput').value = defaultBid;
       document.getElementById('simPriceInput').step = tick;
+
+      selectModalBucket(meta.bucket || '');
+      document.getElementById('modalCustomTargetInput').value = meta.targetPrice || '';
+      document.getElementById('modalNoteInput').value = meta.note || '';
+
       updateSimResult();
 
       const modal = document.getElementById('calcModal');
@@ -1092,16 +1355,39 @@
       modal.classList.add('flex');
     }
 
-    function openFullGuideModal() {
-      const modal = document.getElementById('fullGuideModal');
-      modal.classList.remove('hidden');
-      modal.classList.add('flex');
+    function selectModalBucket(bucketVal) {
+      selectedModalBucket = bucketVal;
+      document.querySelectorAll('.mbucket-btn').forEach(btn => {
+        if (btn.dataset.mbucket === bucketVal) {
+          btn.className = 'mbucket-btn rounded-lg border border-emerald-400 bg-emerald-500/20 px-2 py-1.5 text-[11px] font-bold text-emerald-200';
+        } else {
+          btn.className = 'mbucket-btn rounded-lg border border-slate-700 bg-slate-950 px-2 py-1.5 text-[11px] font-medium text-slate-300 hover:bg-slate-800';
+        }
+      });
     }
 
-    function hideModal(modalId) {
-      const modal = document.getElementById(modalId);
-      modal.classList.add('hidden');
-      modal.classList.remove('flex');
+    function saveItemMetaFromModal() {
+      if (!selectedModalItem) return;
+      const sym = selectedModalItem.drSymbol;
+      const rawTarget = parseFloat(document.getElementById('modalCustomTargetInput').value);
+      const noteText = document.getElementById('modalNoteInput').value.trim();
+
+      userMeta[sym] = {
+        bucket: selectedModalBucket,
+        targetPrice: (!isNaN(rawTarget) && rawTarget > 0) ? rawTarget : null,
+        note: noteText
+      };
+      saveUserMeta();
+
+      if (!watchlist.has(sym)) {
+        watchlist.add(sym);
+        saveWatchlist();
+      }
+
+      renderWatchlistDeck();
+      applyFilters();
+      hideModal('calcModal');
+      showToast(`💾 บันทึกแผนและติดดาว ${sym} เรียบร้อยแล้ว`);
     }
 
     function adjustSimPrice(steps) {
@@ -1118,9 +1404,13 @@
     function updateSimResult() {
       if (!selectedModalItem) return;
       const bid = parseFloat(document.getElementById('simPriceInput').value) || 0;
+      const budget = parseFloat(document.getElementById('simBudgetInput').value) || 0;
+      const isZeroFee = document.getElementById('simHappyHourChk').checked;
       const rawFV = Number(selectedModalItem.rawFairValue) || 0;
+
       const badge = document.getElementById('simDiffBadge');
       const lotCost = document.getElementById('simLotCost');
+      const unitsEl = document.getElementById('simUnitsResult');
 
       lotCost.textContent = (bid * 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' บาท';
 
@@ -1133,6 +1423,174 @@
         badge.textContent = '-';
         badge.className = 'font-bold tabular-nums text-slate-400';
       }
+
+      if (bid > 0 && budget > 0) {
+        const feeRate = isZeroFee ? 0 : 0.00157; // เรตค่าคอมฯ + VAT โดยประมาณเมื่อไม่ใช่ช่วง Happy Hour
+        const effectiveBudget = budget / (1 + feeRate);
+        const totalUnits = Math.floor(effectiveBudget / bid);
+        const lots = Math.floor(totalUnits / 100);
+        const oddUnits = totalUnits % 100;
+        const netSpent = totalUnits * bid * (1 + feeRate);
+        const leftover = Math.max(0, budget - netSpent);
+
+        unitsEl.innerHTML = `<span class="text-emerald-400">${totalUnits.toLocaleString()} หน่วย</span> <span class="text-slate-400 font-normal">(${lots} Lot + เศษ ${oddUnits} | เหลือ ${leftover.toFixed(0)} ฿)</span>`;
+      } else {
+        unitsEl.textContent = '-';
+      }
+    }
+
+    // ==========================================
+    // Modal 2: ตัวช่วยจัดสรรเงินปันผล / งบ DCA รายเดือน
+    // ==========================================
+    function openAllocatorModal() {
+      renderAllocatorResults();
+      const modal = document.getElementById('allocatorModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function renderAllocatorResults() {
+      const container = document.getElementById('allocatorResultBody');
+      const budget = parseFloat(document.getElementById('allocBudgetInput').value) || 0;
+      const bucketFilter = document.getElementById('allocBucketSelect').value;
+      const zoneMode = document.getElementById('allocZoneSelect').value;
+
+      let candidates = allItems.filter(it => watchlist.has(it.drSymbol));
+
+      if (candidates.length === 0) {
+        container.innerHTML = `
+          <div class="rounded-xl border border-dashed border-slate-700 p-6 text-center text-slate-400">
+            ยังไม่มีหุ้นในรายการติดดาว — กดติดดาว (★) หุ้นที่คุณสนใจก่อนใช้งานตัวจัดสรรงบลงทุนครับ
+          </div>`;
+        return;
+      }
+
+      candidates = candidates.filter(item => {
+        const meta = getItemMeta(item.drSymbol);
+        if (bucketFilter !== 'ALL' && meta.bucket !== bucketFilter) return false;
+
+        const status = getZoneStatus(item);
+        const hit = isTargetHit(item);
+        if (zoneMode === 'UNDERVALUED') {
+          return status === 'DISCOUNT' || hit;
+        }
+        if (zoneMode === 'FAIR_OR_BETTER') {
+          return status === 'DISCOUNT' || status === 'FAIR' || hit;
+        }
+        return true;
+      });
+
+      candidates.sort((a, b) => {
+        const diffA = a.diffPct !== null ? Number(a.diffPct) : 999;
+        const diffB = b.diffPct !== null ? Number(b.diffPct) : 999;
+        return diffA - diffB;
+      });
+
+      if (candidates.length === 0) {
+        container.innerHTML = `
+          <div class="rounded-xl border border-slate-800 bg-slate-950/60 p-6 text-center text-slate-400">
+            ไม่พบตัวติดดาวที่เข้าเงื่อนไขโซนราคาในขณะนี้ (ลองเปลี่ยนตัวเลือกเป็น <strong class="text-slate-200">"🟢 น่าสะสม + ⚪ ราคาเหมาะสม"</strong>)
+          </div>`;
+        return;
+      }
+
+      container.innerHTML = candidates.map(item => {
+        const meta = getItemMeta(item.drSymbol);
+        const setP = Number(item.setPrice) || 0;
+        const fairP = Number(item.fairPrice) || 0;
+        const refPrice = setP > 0 ? setP : fairP;
+        const units = (refPrice > 0 && budget > 0) ? Math.floor(budget / refPrice) : 0;
+        const diff = item.diffPct !== null ? Number(item.diffPct) : null;
+        const diffStr = diff !== null ? `${diff > 0 ? '+' : ''}${diff.toFixed(2)}%` : '-';
+        const diffColor = diff !== null && diff < 0 ? 'text-emerald-400' : 'text-slate-300';
+
+        return `
+          <div onclick="hideModal('allocatorModal'); openModalBySymbol('${item.drSymbol}')" class="flex cursor-pointer flex-wrap items-center justify-between gap-2 rounded-xl border border-slate-800 bg-slate-950/80 p-3 transition hover:border-emerald-500/40 hover:bg-slate-900">
+            <div>
+              <div class="flex items-center gap-1.5">
+                <span class="font-bold text-white">${item.drSymbol}</span>
+                ${renderBucketBadge(meta.bucket)}
+                ${isTargetHit(item) ? '<span class="rounded bg-amber-500/20 px-1.5 py-0.5 text-[10px] font-bold text-amber-300">🎯 ถึงเป้า</span>' : ''}
+              </div>
+              <div class="mt-1 flex flex-wrap items-center gap-1.5 text-[11px] text-slate-400">
+                <span>ราคา SET: <strong class="text-white tabular-nums">${formatPrice(setP, item.tickSize)}</strong></span>
+                <span>• Fair: <strong class="text-slate-200 tabular-nums">${formatPrice(fairP, item.tickSize)}</strong></span>
+                <span>• ส่วนต่าง: <strong class="tabular-nums ${diffColor}">${diffStr}</strong></span>
+              </div>
+            </div>
+
+            <div class="text-right tabular-nums">
+              <p class="text-[10px] text-slate-400">งบ ${budget.toLocaleString()} ฿ ซื้อได้</p>
+              <p class="text-sm font-bold text-emerald-400">${units.toLocaleString()} หน่วย</p>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // ==========================================
+    // Modal 3: Export / Import JSON Backup
+    // ==========================================
+    function openBackupModal() {
+      const modal = document.getElementById('backupModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function exportUserDataJson() {
+      const backupObj = {
+        app: 'NexDR',
+        author: 'By. NakinMuni',
+        exportedAt: new Date().toISOString(),
+        watchlist: Array.from(watchlist),
+        userMeta: userMeta
+      };
+      const blob = new Blob([JSON.stringify(backupObj, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `NexDR_Backup_${new Date().toISOString().slice(0, 10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('⬇️ ดาวน์โหลดไฟล์สำรองข้อมูล NexDR เรียบร้อยแล้ว');
+    }
+
+    function importUserDataJson(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          if (Array.isArray(parsed.watchlist)) {
+            watchlist = new Set(parsed.watchlist);
+            saveWatchlist();
+          }
+          if (parsed.userMeta && typeof parsed.userMeta === 'object') {
+            userMeta = parsed.userMeta;
+            saveUserMeta();
+          }
+          renderWatchlistDeck();
+          applyFilters();
+          hideModal('backupModal');
+          showToast('✅ กู้คืนข้อมูลพอร์ตและโน้ตทั้งหมดเรียบร้อยแล้ว!');
+        } catch (err) {
+          alert('ไฟล์สำรองข้อมูลไม่ถูกต้อง กรุณาเลือกไฟล์ .json ที่ส่งออกจาก NexDR');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function openFullGuideModal() {
+      const modal = document.getElementById('fullGuideModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function hideModal(modalId) {
+      const modal = document.getElementById(modalId);
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
     }
 
     function showToast(msg) {
