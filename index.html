@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MyWealth — DR Fair Value Screener</title>
+  <title>MyWealth — DR Command Center</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script>
@@ -12,13 +12,13 @@
       theme: {
         extend: {
           fontFamily: { sans: ['Inter', 'Noto Sans Thai', 'sans-serif'] },
-          colors: { slate: { 850: '#161e2e', 900: '#0f172a', 950: '#090d16' } }
+          colors: { slate: { 850: '#161e2e', 900: '#0f172a', 950: '#080c14' } }
         }
       }
     }
   </script>
   <style>
-    body { background-color: #090d16; color: #f1f5f9; font-family: 'Inter', 'Noto Sans Thai', sans-serif; }
+    body { background-color: #080c14; color: #f1f5f9; font-family: 'Inter', 'Noto Sans Thai', sans-serif; }
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: #0f172a; }
     ::-webkit-scrollbar-thumb { background: #334155; border-radius: 9999px; }
@@ -29,144 +29,221 @@
 
   <!-- Top Sticky Navbar -->
   <header class="sticky top-0 z-30 border-b border-slate-800/80 bg-slate-950/90 backdrop-blur-md">
-    <div class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6">
+    <div class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-2.5 px-4 py-3 sm:px-6">
       <div class="flex items-center gap-3">
-        <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 font-bold text-slate-950 shadow-lg shadow-emerald-500/20">
+        <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400 to-teal-600 font-bold text-slate-950 shadow-lg shadow-emerald-500/20">
           MW
         </div>
         <div>
           <div class="flex items-center gap-2">
             <h1 class="text-base font-bold tracking-tight text-white sm:text-lg">MyWealth</h1>
-            <span class="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[11px] font-medium text-emerald-400">
-              DR Screener
+            <span class="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-400">
+              DR Command Center
             </span>
           </div>
-          <p class="text-xs text-slate-400">คำนวณ Fair Value & โซนตั้งรับบนกระดาน SET</p>
+          <p class="hidden text-xs text-slate-400 sm:block">สแกน Fair Value & ตั้งรับกระดาน SET แบบ 2 ความเร็ว</p>
         </div>
       </div>
 
-      <div class="flex items-center gap-2.5">
-        <div id="statusBadge" class="hidden items-center gap-1.5 rounded-lg border border-slate-800 bg-slate-900 px-2.5 py-1.5 text-xs text-slate-400 sm:flex">
-          <span class="h-2 w-2 rounded-full bg-emerald-400"></span>
+      <div class="flex flex-wrap items-center gap-2">
+        <!-- ปุ่มเปิด/ปิด โพยย่อสรุป -->
+        <button id="toggleQuickGuideBtn" onclick="toggleQuickGuide()" class="inline-flex items-center gap-1 rounded-lg border border-amber-500/30 bg-amber-500/10 px-2.5 py-1.5 text-xs font-medium text-amber-300 transition hover:bg-amber-500/20" title="เปิด/ปิด โพยสรุปใช้งานจริง">
+          <span>⚡ โพยย่อ</span>
+        </button>
+
+        <!-- ปุ่มเปิด คู่มือละเอียด -->
+        <button onclick="openFullGuideModal()" class="inline-flex items-center gap-1 rounded-lg border border-slate-700 bg-slate-900 px-2.5 py-1.5 text-xs font-medium text-slate-300 transition hover:bg-slate-800 hover:text-white" title="อ่านคู่มือและสูตรคำนวณฉบับเต็ม">
+          <span>📖 คู่มือละเอียด</span>
+        </button>
+
+        <!-- สถานะเวลาอัปเดต -->
+        <div id="statusBadge" class="hidden items-center gap-1.5 rounded-lg border border-slate-800 bg-slate-900 px-2.5 py-1.5 text-xs text-slate-400 md:flex">
+          <span id="statusDot" class="h-2 w-2 rounded-full bg-emerald-400"></span>
           <span id="lastUpdatedText">กำลังโหลด...</span>
         </div>
-        <button id="refreshBtn" onclick="loadData(true)" class="inline-flex items-center gap-1.5 rounded-lg bg-slate-800 px-3 py-1.5 text-xs font-medium text-slate-200 transition hover:bg-slate-700 active:scale-95 disabled:opacity-50">
-          <svg id="refreshIcon" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+
+        <!-- ปุ่มรีเฟรชอัจฉริยะ (ดึงสดเฉพาะตัวติดดาว) -->
+        <button id="refreshBtn" onclick="loadData(true)" class="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-500 px-3 py-1.5 text-xs font-bold text-slate-950 shadow-md shadow-emerald-500/20 transition hover:brightness-110 active:scale-95 disabled:opacity-50">
+          <svg id="refreshIcon" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
           </svg>
-          <span>รีเฟรช</span>
+          <span id="refreshBtnLabel">อัปเดตสด (★ 0)</span>
         </button>
       </div>
     </div>
   </header>
 
-  <main class="mx-auto max-w-7xl px-4 py-5 sm:px-6">
-    <!-- KPI Summary Cards -->
-    <section class="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
-      <div class="rounded-xl border border-slate-800/80 bg-slate-900/70 p-3.5">
-        <p class="text-xs text-slate-400">DR ในระบบทั้งหมด</p>
-        <p id="kpiTotal" class="mt-1 text-xl font-bold text-white tabular-nums">-</p>
-      </div>
-      <div class="rounded-xl border border-emerald-500/25 bg-emerald-950/20 p-3.5">
-        <p class="text-xs text-emerald-400">🟢 โซนน่าสะสม (Discount)</p>
-        <p id="kpiDiscount" class="mt-1 text-xl font-bold text-emerald-400 tabular-nums">-</p>
-      </div>
-      <div class="rounded-xl border border-slate-800/80 bg-slate-900/70 p-3.5">
-        <p class="text-xs text-slate-300">⚪ ราคาเหมาะสม (Fair)</p>
-        <p id="kpiFair" class="mt-1 text-xl font-bold text-slate-200 tabular-nums">-</p>
-      </div>
-      <div class="rounded-xl border border-amber-500/25 bg-amber-950/10 p-3.5">
-        <p class="text-xs text-amber-400">★ รายการติดดาว (Watchlist)</p>
-        <p id="kpiWatchlist" class="mt-1 text-xl font-bold text-amber-400 tabular-nums">0</p>
-      </div>
-    </section>
+  <main class="mx-auto max-w-7xl px-4 py-4 sm:px-6">
 
-    <!-- View Tabs & Search / Filter Controls -->
-    <section class="mb-4 flex flex-col gap-3 rounded-xl border border-slate-800/80 bg-slate-900/60 p-3.5">
-      <div class="flex flex-wrap items-center justify-between gap-3">
-        <div class="inline-flex rounded-lg bg-slate-950 p-1 border border-slate-800">
-          <button id="tabAll" onclick="switchTab('all')" class="rounded-md bg-slate-800 px-3 py-1.5 text-xs font-semibold text-white transition">
-            📊 กระดานทั้งหมด
-          </button>
-          <button id="tabWatchlist" onclick="switchTab('watchlist')" class="rounded-md px-3 py-1.5 text-xs font-semibold text-slate-400 transition hover:text-white">
-            ★ ติดดาวของฉัน (<span id="tabWatchCount">0</span>)
-          </button>
+    <!-- 1. แถบโพยย่อสรุป (เน้นโชว์ตอนใช้งานจริง พับเก็บได้) -->
+    <section id="quickGuideBar" class="mb-5 rounded-2xl border border-amber-500/25 bg-gradient-to-r from-slate-900 via-slate-900 to-amber-950/20 p-3.5 shadow-lg">
+      <div class="flex items-center justify-between gap-2 border-b border-slate-800/80 pb-2">
+        <div class="flex items-center gap-2">
+          <span class="flex h-5 w-5 items-center justify-center rounded-md bg-amber-500/20 text-xs text-amber-400">⚡</span>
+          <h2 class="text-xs font-bold text-amber-300">โพยสรุปใช้งานจริง (จังหวะดูหน้างาน)</h2>
         </div>
-
-        <div class="relative w-full sm:w-64">
-          <input id="searchInput" type="text" oninput="applyFilters()" placeholder="ค้นหา DR, หุ้นแม่, ตลาด..." class="w-full rounded-lg border border-slate-700/80 bg-slate-950 py-1.5 pl-8 pr-3 text-xs text-white placeholder-slate-500 focus:border-emerald-500 focus:outline-none" />
-          <svg class="absolute left-2.5 top-2 h-3.5 w-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 103.5 10.5a7.5 7.5 0 0013.15 6.15z" />
-          </svg>
+        <div class="flex items-center gap-2">
+          <button onclick="openFullGuideModal()" class="text-[11px] font-medium text-emerald-400 underline-offset-2 hover:underline">อ่านฉบับละเอียด →</button>
+          <button onclick="toggleQuickGuide()" class="rounded px-1.5 py-0.5 text-[11px] text-slate-400 hover:bg-slate-800 hover:text-white">ซ่อน</button>
         </div>
       </div>
 
-      <div class="flex flex-wrap items-center gap-2 pt-1 border-t border-slate-800/60">
-        <span class="text-[11px] font-medium text-slate-400">โซนราคา:</span>
-        <button onclick="setZoneFilter('ALL')" data-zone="ALL" class="zone-btn rounded-full bg-emerald-500/20 border border-emerald-500/40 px-2.5 py-0.5 text-[11px] font-medium text-emerald-300">ทั้งหมด</button>
-        <button onclick="setZoneFilter('DISCOUNT')" data-zone="DISCOUNT" class="zone-btn rounded-full bg-slate-800/80 border border-slate-700 px-2.5 py-0.5 text-[11px] font-medium text-slate-300 hover:bg-slate-700">🟢 น่าสะสม</button>
-        <button onclick="setZoneFilter('FAIR')" data-zone="FAIR" class="zone-btn rounded-full bg-slate-800/80 border border-slate-700 px-2.5 py-0.5 text-[11px] font-medium text-slate-300 hover:bg-slate-700">⚪ ราคาเหมาะสม</button>
-        <button onclick="setZoneFilter('PREMIUM')" data-zone="PREMIUM" class="zone-btn rounded-full bg-slate-800/80 border border-slate-700 px-2.5 py-0.5 text-[11px] font-medium text-slate-300 hover:bg-slate-700">🔴 แพงกว่าแม่</button>
-
-        <div class="ml-auto flex items-center gap-2">
-          <select id="issuerFilter" onchange="applyFilters()" class="rounded-lg border border-slate-700/80 bg-slate-950 px-2.5 py-1 text-[11px] text-slate-300 focus:border-emerald-500 focus:outline-none">
-            <option value="ALL">ทุกค่าย DR</option>
-          </select>
-          <select id="marketFilter" onchange="applyFilters()" class="rounded-lg border border-slate-700/80 bg-slate-950 px-2.5 py-1 text-[11px] text-slate-300 focus:border-emerald-500 focus:outline-none">
-            <option value="ALL">ทุกตลาดอ้างอิง</option>
-          </select>
+      <div class="mt-2.5 grid grid-cols-1 gap-2.5 text-xs sm:grid-cols-3">
+        <div class="rounded-xl border border-slate-800/80 bg-slate-950/60 p-2.5">
+          <p class="font-semibold text-white">1. ติดดาว (★) ตัวที่เล็ง/ถือในพอร์ต</p>
+          <p class="mt-0.5 text-[11px] leading-relaxed text-slate-400">กดปุ่มสีเขียว <span class="font-semibold text-emerald-400">อัปเดตสด (★)</span> มุมขวาบน ระบบจะดึงราคาจริงเฉพาะตัวติดดาวใน <span class="text-slate-200">~2 วินาที</span> (ตัวอื่นทั้งตลาดอัปเดตอัตโนมัติทุก 5-10 นาที)</p>
+        </div>
+        <div class="rounded-xl border border-slate-800/80 bg-slate-950/60 p-2.5">
+          <p class="font-semibold text-white">2. เช็กป้ายโซนราคาก่อนเคาะ</p>
+          <p class="mt-0.5 text-[11px] leading-relaxed text-slate-400"><span class="font-semibold text-emerald-400">🟢 น่าสะสม</span> = ราคา SET ≤ โซนตั้งรับ (ถูกกว่าแม่) • <span class="text-slate-200">⚪ เหมาะสม</span> = ไม่เกิน Fair • <span class="text-rose-400">🔴 แพงกว่าแม่</span> = ควรรอ</p>
+        </div>
+        <div class="rounded-xl border border-slate-800/80 bg-slate-950/60 p-2.5">
+          <p class="font-semibold text-white">3. จิ้มแถว/การ์ด เพื่อจำลองตั้ง Bid</p>
+          <p class="mt-0.5 text-[11px] leading-relaxed text-slate-400">กดที่หุ้นตัวใดก็ได้เพื่อปรับราคา +/- 1 ช่องตามเกณฑ์ <span class="text-slate-200">Tick Size ใหม่</span> และดูเงินขั้นต่ำต่อ 100 หน่วย</p>
         </div>
       </div>
     </section>
+
+    <!-- Toast แจ้งเตือนสั้นๆ -->
+    <div id="toastBanner" class="mb-4 hidden items-center justify-between rounded-xl border border-emerald-500/30 bg-emerald-950/40 px-4 py-2.5 text-xs text-emerald-200">
+      <span id="toastText">อัปเดตข้อมูลสำเร็จ</span>
+      <button onclick="document.getElementById('toastBanner').classList.add('hidden')" class="text-emerald-400 hover:text-white">✕</button>
+    </div>
 
     <!-- Loading Skeleton -->
-    <div id="loadingState" class="flex flex-col items-center justify-center rounded-xl border border-slate-800 bg-slate-900/50 py-16 text-center">
+    <div id="loadingState" class="flex flex-col items-center justify-center rounded-2xl border border-slate-800 bg-slate-900/50 py-16 text-center">
       <div class="h-8 w-8 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent"></div>
-      <p class="mt-3 text-sm font-medium text-slate-300">กำลังดึงราคาหุ้นแม่ อัตราแลกเปลี่ยน และกระดาน SET...</p>
-      <p class="mt-1 text-xs text-slate-500">ใช้เวลาประมาณ 1-2 วินาที</p>
+      <p class="mt-3 text-sm font-medium text-slate-300">กำลังโหลดกระดาน DR จากฐานข้อมูล...</p>
+      <p class="mt-1 text-xs text-slate-500">ใช้เวลาไม่ถึง 1 วินาที</p>
     </div>
 
     <!-- Error State -->
-    <div id="errorState" class="hidden rounded-xl border border-rose-500/30 bg-rose-950/20 p-6 text-center">
-      <p class="text-sm font-semibold text-rose-400">ไม่สามารถดึงข้อมูลได้ในขณะนี้</p>
+    <div id="errorState" class="hidden rounded-2xl border border-rose-500/30 bg-rose-950/20 p-6 text-center">
+      <p class="text-sm font-semibold text-rose-400">ไม่สามารถเชื่อมต่อข้อมูลได้ในขณะนี้</p>
       <p id="errorMessage" class="mt-1 text-xs text-slate-400"></p>
-      <button onclick="loadData(true)" class="mt-3 rounded-lg bg-rose-500/20 px-4 py-1.5 text-xs font-medium text-rose-300 hover:bg-rose-500/30">ลองใหม่อีกครั้ง</button>
+      <button onclick="loadData(false)" class="mt-3 rounded-lg bg-rose-500/20 px-4 py-1.5 text-xs font-medium text-rose-300 hover:bg-rose-500/30">ลองโหลดใหม่อีกครั้ง</button>
     </div>
 
-    <!-- Data Table -->
-    <section id="tableContainer" class="hidden overflow-hidden rounded-xl border border-slate-800/90 bg-slate-900/60 shadow-xl">
-      <div class="overflow-x-auto">
-        <table class="w-full border-collapse text-left text-xs">
-          <thead>
-            <tr class="border-b border-slate-800 bg-slate-950/80 text-[11px] uppercase tracking-wider text-slate-400">
-              <th class="w-10 px-3 py-3 text-center">★</th>
-              <th class="cursor-pointer px-3 py-3 hover:text-white" onclick="sortBy('drSymbol')">DR / ตลาด ⇅</th>
-              <th class="px-3 py-3 text-right">Ratio</th>
-              <th class="px-3 py-3 text-right">หุ้นแม่ (Parent)</th>
-              <th class="px-3 py-3 text-right">FX (THB)</th>
-              <th class="px-3 py-3 text-right text-emerald-400">🟢 โซนตั้งรับ</th>
-              <th class="cursor-pointer px-3 py-3 text-right hover:text-white" onclick="sortBy('fairPrice')">⚪ Fair Value ⇅</th>
-              <th class="cursor-pointer px-3 py-3 text-right hover:text-white" onclick="sortBy('setPrice')">ราคา SET ⇅</th>
-              <th class="cursor-pointer px-3 py-3 text-right hover:text-white" onclick="sortBy('diffPct')">Prem / Disc ⇅</th>
-              <th class="px-3 py-3 text-center">สถานะ</th>
-            </tr>
-          </thead>
-          <tbody id="tableBody" class="divide-y divide-slate-800/70"></tbody>
-        </table>
-      </div>
-      <div id="emptyState" class="hidden py-12 text-center text-xs text-slate-400">
-        ไม่พบรายการ DR ที่ตรงกับเงื่อนไขการค้นหา
-      </div>
-    </section>
+    <!-- Main Dashboard Content -->
+    <div id="dashboardContent" class="hidden space-y-6">
 
-    <p class="mt-3 text-right text-[11px] text-slate-500">
-      * คลิกที่แถวใดก็ได้เพื่อเปิดเครื่องคิดเลขจำลองราคาตั้ง Bid (Limit Order)
-    </p>
+      <!-- 2. โซนตัวติดดาวของฉัน (Watchlist Command Deck - เด่นสุดด้านบน) -->
+      <section class="rounded-2xl border border-amber-500/25 bg-gradient-to-b from-slate-900/90 to-slate-900/50 p-4 shadow-xl">
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-3">
+          <div class="flex items-center gap-2">
+            <span class="text-base text-amber-400">★</span>
+            <div>
+              <h2 class="text-sm font-bold text-white">กระดานตัวติดดาวของฉัน (<span id="watchlistHeaderCount">0</span> ตัว)</h2>
+              <p class="text-[11px] text-slate-400">กลุ่มที่กดปุ่ม "อัปเดตสด" แล้วดึงราคาหุ้นแม่และกระดาน SET ทันที</p>
+            </div>
+          </div>
+
+          <button onclick="loadData(true)" id="watchlistSyncBtn" class="inline-flex items-center gap-1.5 rounded-lg border border-emerald-500/40 bg-emerald-500/15 px-3 py-1.5 text-xs font-semibold text-emerald-300 transition hover:bg-emerald-500/25 active:scale-95">
+            <span>⚡ อัปเดตราคาสดกลุ่มนี้</span>
+          </button>
+        </div>
+
+        <!-- กรณีมีตัวติดดาว: แสดงเป็น Grid การ์ดสวยๆ อ่านง่ายทั้งมือถือและคอม -->
+        <div id="watchlistCardsGrid" class="mt-3.5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3"></div>
+
+        <!-- กรณียังไม่มีตัวติดดาว: แสดงคำแนะนำ + ปุ่มติดดาวด่วน -->
+        <div id="watchlistEmptyPrompt" class="mt-3.5 rounded-xl border border-dashed border-slate-700 bg-slate-950/60 p-5 text-center">
+          <p class="text-xs font-semibold text-slate-200">ยังไม่มีรายการติดดาวในพอร์ตของคุณ</p>
+          <p class="mt-1 text-[11px] text-slate-400">กดรูปดาว <span class="text-amber-400">☆</span> หน้าชื่อหุ้นในตารางด้านล่าง หรือเลือกจากตัวแนะนำด้านล่างนี้ เพื่อเปิดโหมดอัปเดตสด 2 วินาที:</p>
+          <div id="quickStarChips" class="mt-3 flex flex-wrap justify-center gap-1.5"></div>
+        </div>
+      </section>
+
+      <!-- 3. KPI Summary Cards ทั้งตลาด -->
+      <section class="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div class="rounded-xl border border-slate-800/80 bg-slate-900/70 p-3.5">
+          <p class="text-xs text-slate-400">DR ในฐานข้อมูลทั้งหมด</p>
+          <p id="kpiTotal" class="mt-1 text-xl font-bold text-white tabular-nums">-</p>
+        </div>
+        <div class="rounded-xl border border-emerald-500/25 bg-emerald-950/20 p-3.5">
+          <p class="text-xs text-emerald-400">🟢 โซนน่าสะสม (ทั้งตลาด)</p>
+          <p id="kpiDiscount" class="mt-1 text-xl font-bold text-emerald-400 tabular-nums">-</p>
+        </div>
+        <div class="rounded-xl border border-slate-800/80 bg-slate-900/70 p-3.5">
+          <p class="text-xs text-slate-300">⚪ ราคาเหมาะสม (Fair)</p>
+          <p id="kpiFair" class="mt-1 text-xl font-bold text-slate-200 tabular-nums">-</p>
+        </div>
+        <div class="rounded-xl border border-amber-500/25 bg-amber-950/10 p-3.5">
+          <p class="text-xs text-amber-400">★ ติดดาว (โหมดดึงสด)</p>
+          <p id="kpiWatchlist" class="mt-1 text-xl font-bold text-amber-400 tabular-nums">0</p>
+        </div>
+      </section>
+
+      <!-- 4. ตารางสแกนกระดานทั้งหมด (Full Market Screener) -->
+      <section class="space-y-3">
+        <div class="flex flex-col gap-3 rounded-xl border border-slate-800/80 bg-slate-900/60 p-3.5">
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div class="inline-flex rounded-lg border border-slate-800 bg-slate-950 p-1">
+              <button id="tabAll" onclick="switchTab('all')" class="rounded-md bg-slate-800 px-3 py-1.5 text-xs font-semibold text-white transition">
+                📊 กระดานทั้งหมด (Cache)
+              </button>
+              <button id="tabWatchlist" onclick="switchTab('watchlist')" class="rounded-md px-3 py-1.5 text-xs font-semibold text-slate-400 transition hover:text-white">
+                ★ เฉพาะติดดาว (<span id="tabWatchCount">0</span>)
+              </button>
+            </div>
+
+            <div class="relative w-full sm:w-64">
+              <input id="searchInput" type="text" oninput="applyFilters()" placeholder="ค้นหา DR, หุ้นแม่, ตลาด..." class="w-full rounded-lg border border-slate-700/80 bg-slate-950 py-1.5 pl-8 pr-3 text-xs text-white placeholder-slate-500 focus:border-emerald-500 focus:outline-none" />
+              <svg class="absolute left-2.5 top-2 h-3.5 w-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 103.5 10.5a7.5 7.5 0 0013.15 6.15z" />
+              </svg>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2 border-t border-slate-800/60 pt-2">
+            <span class="text-[11px] font-medium text-slate-400">โซนราคา:</span>
+            <button onclick="setZoneFilter('ALL')" data-zone="ALL" class="zone-btn rounded-full border border-emerald-500/40 bg-emerald-500/20 px-2.5 py-0.5 text-[11px] font-medium text-emerald-300">ทั้งหมด</button>
+            <button onclick="setZoneFilter('DISCOUNT')" data-zone="DISCOUNT" class="zone-btn rounded-full border border-slate-700 bg-slate-800/80 px-2.5 py-0.5 text-[11px] font-medium text-slate-300 hover:bg-slate-700">🟢 น่าสะสม</button>
+            <button onclick="setZoneFilter('FAIR')" data-zone="FAIR" class="zone-btn rounded-full border border-slate-700 bg-slate-800/80 px-2.5 py-0.5 text-[11px] font-medium text-slate-300 hover:bg-slate-700">⚪ ราคาเหมาะสม</button>
+            <button onclick="setZoneFilter('PREMIUM')" data-zone="PREMIUM" class="zone-btn rounded-full border border-slate-700 bg-slate-800/80 px-2.5 py-0.5 text-[11px] font-medium text-slate-300 hover:bg-slate-700">🔴 แพงกว่าแม่</button>
+
+            <div class="ml-auto flex items-center gap-2">
+              <select id="issuerFilter" onchange="applyFilters()" class="rounded-lg border border-slate-700/80 bg-slate-950 px-2.5 py-1 text-[11px] text-slate-300 focus:border-emerald-500 focus:outline-none">
+                <option value="ALL">ทุกค่าย DR</option>
+              </select>
+              <select id="marketFilter" onchange="applyFilters()" class="rounded-lg border border-slate-700/80 bg-slate-950 px-2.5 py-1 text-[11px] text-slate-300 focus:border-emerald-500 focus:outline-none">
+                <option value="ALL">ทุกตลาดอ้างอิง</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="overflow-hidden rounded-xl border border-slate-800/90 bg-slate-900/60 shadow-xl">
+          <div class="overflow-x-auto">
+            <table class="w-full border-collapse text-left text-xs">
+              <thead>
+                <tr class="border-b border-slate-800 bg-slate-950/80 text-[11px] uppercase tracking-wider text-slate-400">
+                  <th class="w-10 px-3 py-3 text-center">★</th>
+                  <th class="cursor-pointer px-3 py-3 hover:text-white" onclick="sortBy('drSymbol')">DR / ตลาด ⇅</th>
+                  <th class="px-3 py-3 text-right">Ratio</th>
+                  <th class="px-3 py-3 text-right">หุ้นแม่ (Parent)</th>
+                  <th class="px-3 py-3 text-right">FX (THB)</th>
+                  <th class="px-3 py-3 text-right text-emerald-400">🟢 โซนตั้งรับ</th>
+                  <th class="cursor-pointer px-3 py-3 text-right hover:text-white" onclick="sortBy('fairPrice')">⚪ Fair Value ⇅</th>
+                  <th class="cursor-pointer px-3 py-3 text-right hover:text-white" onclick="sortBy('setPrice')">ราคา SET ⇅</th>
+                  <th class="cursor-pointer px-3 py-3 text-right hover:text-white" onclick="sortBy('diffPct')">Prem / Disc ⇅</th>
+                  <th class="px-3 py-3 text-center">สถานะ</th>
+                </tr>
+              </thead>
+              <tbody id="tableBody" class="divide-y divide-slate-800/70"></tbody>
+            </table>
+          </div>
+          <div id="emptyState" class="hidden py-12 text-center text-xs text-slate-400">
+            ไม่พบรายการ DR ที่ตรงกับเงื่อนไขการค้นหา
+          </div>
+        </div>
+      </section>
+    </div>
   </main>
 
-  <!-- Limit Order / Bid Simulator Modal -->
-  <div id="calcModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/80 p-4 backdrop-blur-sm" onclick="closeModal(event)">
-    <div class="w-full max-w-md rounded-2xl border border-slate-700/80 bg-slate-900 p-5 shadow-2xl" onclick="event.stopPropagation()">
+  <!-- Modal 1: เครื่องคิดเลขจำลองตั้ง Bid -->
+  <div id="calcModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/80 p-4 backdrop-blur-sm" onclick="if(event.target.id==='calcModal') hideModal('calcModal')">
+    <div class="w-full max-w-md rounded-2xl border border-slate-700/80 bg-slate-900 p-5 shadow-2xl">
       <div class="flex items-start justify-between border-b border-slate-800 pb-3">
         <div>
           <div class="flex items-center gap-2">
@@ -175,7 +252,7 @@
           </div>
           <p id="modalSubtitle" class="mt-0.5 text-xs text-slate-400">Ratio 1:1,000 • Tick Size 0.05 ฿</p>
         </div>
-        <button onclick="hideModal()" class="rounded-lg p-1 text-slate-400 hover:bg-slate-800 hover:text-white">✕</button>
+        <button onclick="hideModal('calcModal')" class="rounded-lg p-1 text-slate-400 hover:bg-slate-800 hover:text-white">✕</button>
       </div>
 
       <div class="mt-4 grid grid-cols-3 gap-2 rounded-xl bg-slate-950 p-3 text-center">
@@ -217,6 +294,83 @@
     </div>
   </div>
 
+  <!-- Modal 2: คู่มือการใช้งานฉบับละเอียด (สำหรับตอนมีเวลานั่งอ่าน) -->
+  <div id="fullGuideModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/85 p-4 backdrop-blur-sm" onclick="if(event.target.id==='fullGuideModal') hideModal('fullGuideModal')">
+    <div class="flex max-h-[88vh] w-full max-w-2xl flex-col rounded-2xl border border-slate-700/80 bg-slate-900 shadow-2xl">
+      <!-- Header -->
+      <div class="flex items-center justify-between border-b border-slate-800 px-5 py-4">
+        <div>
+          <h3 class="text-base font-bold text-white">📖 คู่มือการใช้งาน MyWealth DR Command Center (ฉบับละเอียด)</h3>
+          <p class="mt-0.5 text-xs text-slate-400">เข้าใจกลไกการทำงาน สูตรคำนวณ Fair Value และเกณฑ์ Tick Size ใหม่</p>
+        </div>
+        <button onclick="hideModal('fullGuideModal')" class="rounded-lg p-1.5 text-slate-400 hover:bg-slate-800 hover:text-white">✕</button>
+      </div>
+
+      <!-- Scrollable Body -->
+      <div class="space-y-5 overflow-y-auto px-5 py-4 text-xs leading-relaxed text-slate-300">
+        
+        <div class="rounded-xl border border-emerald-500/25 bg-emerald-950/15 p-4">
+          <h4 class="text-sm font-bold text-emerald-400">1. ระบบทำงานแบบ 2 ความเร็ว (ทำไมต้องแยก "ตัวติดดาว" กับ "แคชทั้งตลาด")</h4>
+          <p class="mt-1.5 text-slate-300">เมื่อฐานข้อมูล DR มีจำนวนมาก (141 ถึง 400+ ตัว) การดึงราคาหุ้นต่างประเทศทั้งหมดพร้อมกันในคราวเดียวจะใช้เวลาราว 40–90 วินาที ซึ่งเกินขีดจำกัดการรอของหน้าเว็บ ระบบจึงถูกออกแบบแยกเป็น 2 ส่วน:</p>
+          <ul class="mt-2 list-disc space-y-1.5 pl-5 text-slate-300">
+            <li><strong class="text-white">โหมดดึงสดตัวติดดาว (Starred Live Sync):</strong> เมื่อคุณกดรูปดาว <span class="text-amber-400">★</span> หน้าชื่อหุ้นที่ถือหรือเล็งไว้ แล้วกดปุ่ม <strong class="text-emerald-400">อัปเดตสด (★)</strong> หน้าเว็บจะส่งเฉพาะรายชื่อกลุ่มนี้ไปดึงราคาหุ้นแม่, ราคาบน SET และค่าเงินแบบเรียลไทม์ ใช้เวลาเพียง <strong class="text-white">1.5 – 3 วินาที</strong></li>
+            <li><strong class="text-white">โหมดสแกนทั้งตลาดเบื้องหลัง (Background Cache):</strong> Google Apps Script จะทยอยดึงข้อมูลครบทุกตัวในชีตให้อัตโนมัติทุกๆ 5–10 นาที (ตามเวลาที่คุณตั้งใน Trigger) แล้วเก็บลงแท็บซ่อน <code class="rounded bg-slate-800 px-1 py-0.5 text-amber-300">_CACHE_JSON</code> ทำให้เปิดหน้าเว็บเมื่อไหร่ก็เห็นข้อมูลทั้งตลาดทันทีในไม่ถึง 0.5 วินาที</li>
+          </ul>
+        </div>
+
+        <div class="rounded-xl border border-slate-800 bg-slate-950/70 p-4">
+          <h4 class="text-sm font-bold text-white">2. สูตรคำนวณ Fair Value และความหมายของป้ายสถานะ</h4>
+          <div class="mt-2 rounded-lg border border-slate-800 bg-slate-900 p-2.5 text-center font-mono text-xs text-emerald-300">
+            Fair Value (บาท) = (ราคาหุ้นแม่ต่างประเทศ × อัตราแลกเปลี่ยน) ÷ Ratio
+          </div>
+          <ul class="mt-2.5 space-y-2 text-slate-300">
+            <li><span class="rounded bg-emerald-500/20 px-1.5 py-0.5 font-semibold text-emerald-400">🟢 น่าสะสม (Discount)</span> : ราคาบนกระดาน SET ต่ำกว่าหรือเท่ากับ <strong>โซนตั้งรับ (Fair Value ลบ 1 Tick)</strong> หมายความว่าซื้อได้ถูกกว่ามูลค่าหุ้นแม่จริง (ค่า Prem/Disc ติดลบ)</li>
+            <li><span class="rounded bg-slate-800 px-1.5 py-0.5 font-semibold text-slate-200">⚪ ราคาเหมาะสม (Fair)</span> : ราคาบนกระดานอยู่ระหว่างโซนตั้งรับจนถึงราคา Fair Value พอดี เป็นราคายุติธรรมสำหรับทยอยสะสม</li>
+            <li><span class="rounded bg-rose-500/20 px-1.5 py-0.5 font-semibold text-rose-400">🔴 แพงกว่าแม่ (Premium)</span> : ราคาบนกระดานสูงกว่า Fair Value จริง หากไม่รีบควรตั้ง Bid รอในโซนสีเขียวแทนการเคาะขวา</li>
+          </ul>
+        </div>
+
+        <div class="rounded-xl border border-slate-800 bg-slate-950/70 p-4">
+          <h4 class="text-sm font-bold text-white">3. เกณฑ์ช่วงราคา (Tick Size) ใหม่ของ SET (บังคับใช้ 16 พ.ย. 2569)</h4>
+          <p class="mt-1 text-slate-400">ระบบคำนวณโซนตั้งรับและการปุ่ม +/- 1 Tick ในเครื่องคิดเลขตามเกณฑ์ใหม่ของตลาดหลักทรัพย์ฯ แล้ว:</p>
+          <div class="mt-2.5 overflow-hidden rounded-lg border border-slate-800">
+            <table class="w-full text-left text-[11px]">
+              <thead class="bg-slate-900 text-slate-400">
+                <tr>
+                  <th class="px-3 py-2">ช่วงราคาหุ้น / DR (บาท)</th>
+                  <th class="px-3 py-2 text-right">ช่วงราคาใหม่ (Tick Size)</th>
+                  <th class="px-3 py-2 text-right">เทียบเกณฑ์เดิม</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-800/80 text-slate-300">
+                <tr><td class="px-3 py-1.5">ต่ำกว่า 2.00</td><td class="px-3 py-1.5 text-right font-semibold text-white">0.01</td><td class="px-3 py-1.5 text-right text-slate-500">0.01 (คงเดิม)</td></tr>
+                <tr class="bg-emerald-950/10"><td class="px-3 py-1.5">2.00 – 9.98</td><td class="px-3 py-1.5 text-right font-bold text-emerald-400">0.02</td><td class="px-3 py-1.5 text-right text-slate-400">เดิมช่วง 5-10 บาท ใช้ 0.05</td></tr>
+                <tr class="bg-emerald-950/10"><td class="px-3 py-1.5">10.00 – 24.95</td><td class="px-3 py-1.5 text-right font-bold text-emerald-400">0.05</td><td class="px-3 py-1.5 text-right text-slate-400">เดิม 0.10</td></tr>
+                <tr class="bg-emerald-950/10"><td class="px-3 py-1.5">25.00 – 49.90</td><td class="px-3 py-1.5 text-right font-bold text-emerald-400">0.10</td><td class="px-3 py-1.5 text-right text-slate-400">เดิม 0.25</td></tr>
+                <tr><td class="px-3 py-1.5">50.00 – 99.75</td><td class="px-3 py-1.5 text-right font-semibold text-white">0.25</td><td class="px-3 py-1.5 text-right text-slate-500">0.25 (คงเดิม)</td></tr>
+                <tr><td class="px-3 py-1.5">100.00 – 199.50</td><td class="px-3 py-1.5 text-right font-semibold text-white">0.50</td><td class="px-3 py-1.5 text-right text-slate-500">0.50 (คงเดิม)</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="rounded-xl border border-slate-800 bg-slate-950/70 p-4">
+          <h4 class="text-sm font-bold text-white">4. วิธีเพิ่ม DR ค่ายอื่นๆ ใน Google Sheets & ปักหมุดเป็นแอป</h4>
+          <ul class="mt-1.5 list-disc space-y-1.5 pl-5 text-slate-300">
+            <li><strong class="text-white">เพิ่มรายชื่อ DR ใหม่:</strong> พิมพ์ต่อท้ายในแท็บ <code class="rounded bg-slate-800 px-1 py-0.5 text-amber-300">DR</code> โดยระบุให้ครบ 5 คอลัมน์ (<code class="text-slate-200">DR | Ratio | ตลาดอ้างอิง | Ticker | Currency</code>) เช่น <code class="text-slate-200">ASML01 | 1:100 | Euronext | ASML.AS | EUR</code> หรือ <code class="text-slate-200">JEPI19 | 1:100 | NYSE | JEPI | USD</code></li>
+            <li><strong class="text-white">ระวังช่องว่างท้ายคำ:</strong> อย่าให้มีเว้นวรรคต่อท้ายชื่อ Ticker (ระบบจะตัดให้อัตโนมัติ แต่พิมพ์ให้ชิดจะดีที่สุด)</li>
+            <li><strong class="text-white">ใช้งานแบบแอปบนมือถือ:</strong> เปิดหน้านี้ผ่าน Chrome → กดปุ่ม <strong>⋮ (มุมขวาบน)</strong> → เลือก <strong>เพิ่มลงในหน้าจอหลัก (Add to Home Screen)</strong></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="border-t border-slate-800 px-5 py-3 text-right">
+        <button onclick="hideModal('fullGuideModal')" class="rounded-lg bg-emerald-500 px-4 py-1.5 text-xs font-bold text-slate-950 hover:brightness-110">เข้าใจแล้ว ปิดคู่มือ</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     // ลิงก์ API จาก Google Apps Script ของคุณ
     const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbyMRvJRIASXpFhRIkIm8yJGe0rexG4N0BOxXeBoLjGzLEmXlq9KRq9YmfeF8LZG5cnt/exec';
@@ -228,6 +382,7 @@
     let selectedModalItem = null;
 
     const WATCHLIST_KEY = 'mywealth_watchlist_v1';
+    const QUICK_GUIDE_KEY = 'mywealth_quick_guide_visible_v1';
     let watchlist = new Set(JSON.parse(localStorage.getItem(WATCHLIST_KEY) || '[]'));
 
     function saveWatchlist() {
@@ -236,15 +391,34 @@
     }
 
     function updateWatchlistCounters() {
-      document.getElementById('kpiWatchlist').textContent = watchlist.size;
-      document.getElementById('tabWatchCount').textContent = watchlist.size;
+      const count = watchlist.size;
+      document.getElementById('kpiWatchlist').textContent = count;
+      document.getElementById('tabWatchCount').textContent = count;
+      document.getElementById('watchlistHeaderCount').textContent = count;
+      document.getElementById('refreshBtnLabel').textContent = count > 0
+        ? `อัปเดตสด (★ ${count})`
+        : 'โหลดแคชล่าสุด';
+    }
+
+    function toggleQuickGuide() {
+      const bar = document.getElementById('quickGuideBar');
+      const isHidden = bar.classList.toggle('hidden');
+      localStorage.setItem(QUICK_GUIDE_KEY, isHidden ? '0' : '1');
+    }
+
+    function initQuickGuideState() {
+      const saved = localStorage.getItem(QUICK_GUIDE_KEY);
+      if (saved === '0') {
+        document.getElementById('quickGuideBar').classList.add('hidden');
+      }
     }
 
     function toggleStar(event, symbol) {
-      event.stopPropagation();
+      if (event) event.stopPropagation();
       if (watchlist.has(symbol)) watchlist.delete(symbol);
       else watchlist.add(symbol);
       saveWatchlist();
+      renderWatchlistDeck();
       applyFilters();
     }
 
@@ -266,19 +440,128 @@
       zoneFilter = zone;
       document.querySelectorAll('.zone-btn').forEach(btn => {
         if (btn.dataset.zone === zone) {
-          btn.className = 'zone-btn rounded-full bg-emerald-500/20 border border-emerald-500/40 px-2.5 py-0.5 text-[11px] font-medium text-emerald-300';
+          btn.className = 'zone-btn rounded-full border border-emerald-500/40 bg-emerald-500/20 px-2.5 py-0.5 text-[11px] font-medium text-emerald-300';
         } else {
-          btn.className = 'zone-btn rounded-full bg-slate-800/80 border border-slate-700 px-2.5 py-0.5 text-[11px] font-medium text-slate-300 hover:bg-slate-700';
+          btn.className = 'zone-btn rounded-full border border-slate-700 bg-slate-800/80 px-2.5 py-0.5 text-[11px] font-medium text-slate-300 hover:bg-slate-700';
         }
       });
       applyFilters();
     }
 
     function getZoneStatus(item) {
-      if (!item.setPrice || item.setPrice <= 0 || !item.fairPrice) return 'PENDING';
-      if (item.setPrice <= item.buyTarget) return 'DISCOUNT';
-      if (item.setPrice <= item.fairPrice) return 'FAIR';
+      const setP = Number(item.setPrice) || 0;
+      const fairP = Number(item.fairPrice) || 0;
+      const buyT = Number(item.buyTarget) || 0;
+      if (setP <= 0 || fairP <= 0) return 'PENDING';
+      if (setP <= buyT) return 'DISCOUNT';
+      if (setP <= fairP) return 'FAIR';
       return 'PREMIUM';
+    }
+
+    function formatPrice(val, tick) {
+      const num = Number(val) || 0;
+      if (num <= 0) return '-';
+      const decimals = (Number(tick) >= 1) ? 0 : 2;
+      return num.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+    }
+
+    // แสดงการ์ดกลุ่มตัวติดดาวด้านบนสุด
+    function renderWatchlistDeck() {
+      const grid = document.getElementById('watchlistCardsGrid');
+      const emptyPrompt = document.getElementById('watchlistEmptyPrompt');
+      const syncBtn = document.getElementById('watchlistSyncBtn');
+
+      const starredItems = allItems.filter(it => watchlist.has(it.drSymbol));
+
+      if (starredItems.length === 0) {
+        grid.innerHTML = '';
+        grid.classList.add('hidden');
+        emptyPrompt.classList.remove('hidden');
+        syncBtn.classList.add('hidden');
+
+        // แสดงปุ่มกดติดดาวด่วนจากตัวที่มีในชีต
+        const suggestions = ['GOOG80', 'AAPL80', 'NVDA80', 'KO80', 'PEP80', 'BYDCOM80', 'XIAOMI80', 'MA80']
+          .filter(sym => allItems.some(it => it.drSymbol === sym));
+        const chipsBox = document.getElementById('quickStarChips');
+        chipsBox.innerHTML = suggestions.map(sym => `
+          <button onclick="toggleStar(event, '${sym}')" class="rounded-full border border-amber-500/30 bg-amber-500/10 px-2.5 py-1 text-[11px] font-medium text-amber-300 transition hover:bg-amber-500/20">
+            ☆ ติดดาว ${sym}
+          </button>
+        `).join('');
+        return;
+      }
+
+      emptyPrompt.classList.add('hidden');
+      grid.classList.remove('hidden');
+      syncBtn.classList.remove('hidden');
+
+      grid.innerHTML = starredItems.map(item => {
+        const status = getZoneStatus(item);
+        const setP = Number(item.setPrice) || 0;
+        const fairP = Number(item.fairPrice) || 0;
+        const buyT = Number(item.buyTarget) || 0;
+        const parentP = Number(item.parentPrice) || 0;
+        const chg = Number(item.parentChangePct) || 0;
+
+        let borderClass = 'border-slate-800 bg-slate-950/80';
+        let statusTag = '<span class="rounded-full bg-slate-800 px-2 py-0.5 text-[10px] text-slate-400">รอราคา SET</span>';
+        if (status === 'DISCOUNT') {
+          borderClass = 'border-emerald-500/40 bg-emerald-950/15';
+          statusTag = '<span class="rounded-full border border-emerald-500/30 bg-emerald-500/20 px-2 py-0.5 text-[10px] font-bold text-emerald-300">🟢 น่าสะสม</span>';
+        } else if (status === 'FAIR') {
+          borderClass = 'border-slate-700 bg-slate-950/80';
+          statusTag = '<span class="rounded-full bg-slate-800 px-2 py-0.5 text-[10px] font-semibold text-slate-200">⚪ เหมาะสม</span>';
+        } else if (status === 'PREMIUM') {
+          borderClass = 'border-rose-500/35 bg-rose-950/10';
+          statusTag = '<span class="rounded-full border border-rose-500/30 bg-rose-500/15 px-2 py-0.5 text-[10px] font-semibold text-rose-300">🔴 แพงกว่าแม่</span>';
+        }
+
+        let diffBadge = '<span class="text-slate-500">-</span>';
+        if (item.diffPct !== null && setP > 0) {
+          const d = Number(item.diffPct);
+          const sign = d > 0 ? '+' : '';
+          const color = d < 0 ? 'text-emerald-400' : (d > 0 ? 'text-rose-400' : 'text-slate-300');
+          diffBadge = `<span class="font-bold tabular-nums ${color}">${sign}${d.toFixed(2)}%</span>`;
+        }
+
+        return `
+          <div onclick="openModalBySymbol('${item.drSymbol}')" class="cursor-pointer rounded-xl border ${borderClass} p-3.5 transition hover:border-amber-400/50 hover:bg-slate-900">
+            <div class="flex items-start justify-between gap-2">
+              <div class="flex items-center gap-2">
+                <button onclick="toggleStar(event, '${item.drSymbol}')" class="text-base leading-none text-amber-400 transition hover:scale-125" title="นำออกจากรายการติดดาว">★</button>
+                <div>
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-sm font-bold text-white">${item.drSymbol}</span>
+                    <span class="rounded bg-slate-800 px-1.5 py-0.5 text-[10px] text-slate-400">${item.parentTicker}</span>
+                  </div>
+                  <p class="text-[10px] text-slate-400">${item.market} • Ratio ${item.ratioText}</p>
+                </div>
+              </div>
+              ${statusTag}
+            </div>
+
+            <div class="mt-3 grid grid-cols-3 gap-1.5 rounded-lg bg-slate-900/90 p-2 text-center tabular-nums">
+              <div>
+                <p class="text-[10px] text-emerald-400">🟢 ตั้งรับ</p>
+                <p class="mt-0.5 text-xs font-bold text-emerald-400">${buyT > 0 ? '≤ ' + formatPrice(buyT, item.tickSize) : '-'}</p>
+              </div>
+              <div class="border-x border-slate-800">
+                <p class="text-[10px] text-slate-400">⚪ Fair</p>
+                <p class="mt-0.5 text-xs font-bold text-white">${formatPrice(fairP, item.tickSize)}</p>
+              </div>
+              <div>
+                <p class="text-[10px] text-slate-400">กระดาน SET</p>
+                <p class="mt-0.5 text-xs font-bold text-slate-100">${formatPrice(setP, item.tickSize)}</p>
+              </div>
+            </div>
+
+            <div class="mt-2.5 flex items-center justify-between text-[11px]">
+              <span class="text-slate-400">แม่: <strong class="text-slate-200 tabular-nums">${parentP > 0 ? parentP.toFixed(2) : '-'}</strong> ${item.currency} <span class="${chg >= 0 ? 'text-emerald-400' : 'text-rose-400'}">(${chg >= 0 ? '+' : ''}${chg.toFixed(2)}%)</span></span>
+              <span>ส่วนต่าง: ${diffBadge}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
     }
 
     function populateDropdowns(items) {
@@ -356,12 +639,6 @@
       renderTable(filtered);
     }
 
-    function formatPrice(val, tick) {
-      if (!val || val <= 0) return '-';
-      const decimals = (tick && tick >= 1) ? 0 : 2;
-      return val.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
-    }
-
     function renderTable(items) {
       const tbody = document.getElementById('tableBody');
       const emptyState = document.getElementById('emptyState');
@@ -376,6 +653,14 @@
       tbody.innerHTML = items.map(item => {
         const isStarred = watchlist.has(item.drSymbol);
         const status = getZoneStatus(item);
+        const parentP = Number(item.parentPrice) || 0;
+        const chg = Number(item.parentChangePct) || 0;
+        const fx = Number(item.fxRate) || 0;
+        const buyT = Number(item.buyTarget) || 0;
+        const fairP = Number(item.fairPrice) || 0;
+        const rawFV = Number(item.rawFairValue) || 0;
+        const setP = Number(item.setPrice) || 0;
+        const tick = Number(item.tickSize) || 0.01;
 
         let badgeHtml = '<span class="rounded-full bg-slate-800 px-2 py-0.5 text-[10px] text-slate-400">รอราคา SET</span>';
         if (status === 'DISCOUNT') {
@@ -387,17 +672,18 @@
         }
 
         let diffHtml = '<span class="text-slate-500">-</span>';
-        if (item.diffPct !== null && item.setPrice > 0) {
-          const sign = item.diffPct > 0 ? '+' : '';
-          const color = item.diffPct < 0 ? 'text-emerald-400' : (item.diffPct > 0 ? 'text-rose-400' : 'text-slate-300');
-          diffHtml = `<span class="font-bold tabular-nums ${color}">${sign}${item.diffPct.toFixed(2)}%</span>`;
+        if (item.diffPct !== null && setP > 0) {
+          const d = Number(item.diffPct);
+          const sign = d > 0 ? '+' : '';
+          const color = d < 0 ? 'text-emerald-400' : (d > 0 ? 'text-rose-400' : 'text-slate-300');
+          diffHtml = `<span class="font-bold tabular-nums ${color}">${sign}${d.toFixed(2)}%</span>`;
         }
 
-        const chgColor = item.parentChangePct >= 0 ? 'text-emerald-400' : 'text-rose-400';
-        const chgSign = item.parentChangePct >= 0 ? '+' : '';
+        const chgColor = chg >= 0 ? 'text-emerald-400' : 'text-rose-400';
+        const chgSign = chg >= 0 ? '+' : '';
 
         return `
-          <tr onclick='openModal(${JSON.stringify(item)})' class="cursor-pointer transition hover:bg-slate-800/50">
+          <tr onclick="openModalBySymbol('${item.drSymbol}')" class="cursor-pointer transition hover:bg-slate-800/50 ${isStarred ? 'bg-amber-950/10' : ''}">
             <td class="px-3 py-3 text-center">
               <button onclick="toggleStar(event, '${item.drSymbol}')" class="text-base leading-none transition hover:scale-125 ${isStarred ? 'text-amber-400' : 'text-slate-600 hover:text-slate-400'}">
                 ${isStarred ? '★' : '☆'}
@@ -412,19 +698,19 @@
             </td>
             <td class="px-3 py-3 text-right text-slate-300 tabular-nums">${item.ratioText}</td>
             <td class="px-3 py-3 text-right tabular-nums">
-              <div class="font-medium text-slate-200">${item.parentPrice > 0 ? item.parentPrice.toLocaleString('en-US', {minimumFractionDigits: 2}) : '-'} <span class="text-[10px] text-slate-500">${item.currency}</span></div>
-              <div class="text-[10px] ${chgColor}">${chgSign}${item.parentChangePct}%</div>
+              <div class="font-medium text-slate-200">${parentP > 0 ? parentP.toLocaleString('en-US', {minimumFractionDigits: 2}) : '-'} <span class="text-[10px] text-slate-500">${item.currency}</span></div>
+              <div class="text-[10px] ${chgColor}">${parentP > 0 ? chgSign + chg.toFixed(2) + '%' : ''}</div>
             </td>
-            <td class="px-3 py-3 text-right text-slate-400 tabular-nums">${item.fxRate > 0 ? item.fxRate.toFixed(2) : '-'}</td>
+            <td class="px-3 py-3 text-right text-slate-400 tabular-nums">${fx > 0 ? fx.toFixed(2) : '-'}</td>
             <td class="px-3 py-3 text-right font-semibold text-emerald-400 tabular-nums">
-              ${item.buyTarget > 0 ? '≤ ' + formatPrice(item.buyTarget, item.tickSize) : '-'}
+              ${buyT > 0 ? '≤ ' + formatPrice(buyT, tick) : '-'}
             </td>
             <td class="px-3 py-3 text-right tabular-nums">
-              <div class="font-bold text-white">${formatPrice(item.fairPrice, item.tickSize)}</div>
-              <div class="text-[10px] text-slate-500">(${item.rawFairValue.toFixed(3)})</div>
+              <div class="font-bold text-white">${formatPrice(fairP, tick)}</div>
+              <div class="text-[10px] text-slate-500">${rawFV > 0 ? '(' + rawFV.toFixed(3) + ')' : ''}</div>
             </td>
             <td class="px-3 py-3 text-right font-bold text-slate-100 tabular-nums">
-              ${formatPrice(item.setPrice, item.tickSize)}
+              ${formatPrice(setP, tick)}
             </td>
             <td class="px-3 py-3 text-right">${diffHtml}</td>
             <td class="px-3 py-3 text-center">${badgeHtml}</td>
@@ -433,18 +719,27 @@
       }).join('');
     }
 
-    function openModal(item) {
+    function openModalBySymbol(symbol) {
+      const item = allItems.find(it => it.drSymbol === symbol);
+      if (!item) return;
       selectedModalItem = item;
+
+      const tick = Number(item.tickSize) || 0.01;
+      const fx = Number(item.fxRate) || 0;
+      const buyT = Number(item.buyTarget) || 0;
+      const fairP = Number(item.fairPrice) || 0;
+      const setP = Number(item.setPrice) || 0;
+
       document.getElementById('modalTitle').textContent = item.drSymbol;
       document.getElementById('modalMarket').textContent = `${item.market} • ${item.parentTicker}`;
-      document.getElementById('modalSubtitle').textContent = `Ratio ${item.ratioText} • Tick Size ${item.tickSize.toFixed(2)} ฿ • FX ${item.fxRate}`;
-      document.getElementById('modalBuyTarget').textContent = '≤ ' + formatPrice(item.buyTarget, item.tickSize) + ' ฿';
-      document.getElementById('modalFairPrice').textContent = formatPrice(item.fairPrice, item.tickSize) + ' ฿';
-      document.getElementById('modalSetPrice').textContent = (item.setPrice > 0 ? formatPrice(item.setPrice, item.tickSize) + ' ฿' : 'รอเปิดตลาด');
+      document.getElementById('modalSubtitle').textContent = `Ratio ${item.ratioText} • Tick Size ${tick.toFixed(2)} ฿ • FX ${fx.toFixed(2)}`;
+      document.getElementById('modalBuyTarget').textContent = buyT > 0 ? '≤ ' + formatPrice(buyT, tick) + ' ฿' : '-';
+      document.getElementById('modalFairPrice').textContent = fairP > 0 ? formatPrice(fairP, tick) + ' ฿' : '-';
+      document.getElementById('modalSetPrice').textContent = setP > 0 ? formatPrice(setP, tick) + ' ฿' : 'รอเปิดตลาด';
 
-      const defaultBid = item.buyTarget || item.fairPrice || 0;
+      const defaultBid = buyT || fairP || 0;
       document.getElementById('simPriceInput').value = defaultBid;
-      document.getElementById('simPriceInput').step = item.tickSize;
+      document.getElementById('simPriceInput').step = tick;
       updateSimResult();
 
       const modal = document.getElementById('calcModal');
@@ -452,12 +747,25 @@
       modal.classList.add('flex');
     }
 
+    function openFullGuideModal() {
+      const modal = document.getElementById('fullGuideModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function hideModal(modalId) {
+      const modal = document.getElementById(modalId);
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
     function adjustSimPrice(steps) {
       if (!selectedModalItem) return;
+      const tick = Number(selectedModalItem.tickSize) || 0.01;
       const input = document.getElementById('simPriceInput');
-      const current = parseFloat(input.value) || selectedModalItem.fairPrice || 0;
-      const next = Math.max(selectedModalItem.tickSize, current + (steps * selectedModalItem.tickSize));
-      const decimals = selectedModalItem.tickSize < 1 ? 2 : 0;
+      const current = parseFloat(input.value) || Number(selectedModalItem.fairPrice) || 0;
+      const next = Math.max(tick, current + (steps * tick));
+      const decimals = tick < 1 ? 2 : 0;
       input.value = next.toFixed(decimals);
       updateSimResult();
     }
@@ -465,7 +773,7 @@
     function updateSimResult() {
       if (!selectedModalItem) return;
       const bid = parseFloat(document.getElementById('simPriceInput').value) || 0;
-      const rawFV = selectedModalItem.rawFairValue;
+      const rawFV = Number(selectedModalItem.rawFairValue) || 0;
       const badge = document.getElementById('simDiffBadge');
       const lotCost = document.getElementById('simLotCost');
 
@@ -482,17 +790,18 @@
       }
     }
 
-    function hideModal() {
-      const modal = document.getElementById('calcModal');
-      modal.classList.add('hidden');
-      modal.classList.remove('flex');
+    function showToast(msg) {
+      const banner = document.getElementById('toastBanner');
+      document.getElementById('toastText').textContent = msg;
+      banner.classList.remove('hidden');
+      banner.classList.add('flex');
+      setTimeout(() => {
+        banner.classList.add('hidden');
+        banner.classList.remove('flex');
+      }, 4500);
     }
 
-    function closeModal(e) {
-      if (e.target.id === 'calcModal') hideModal();
-    }
-
-    // ดึงข้อมูลจาก Apps Script JSON API ผ่าน fetch()
+    // โหลดข้อมูลจาก Apps Script API (รองรับทั้งดึง Cache ทั้งกระดาน และดึงสดเฉพาะตัวติดดาว)
     function loadData(forceRefresh = false) {
       const btn = document.getElementById('refreshBtn');
       const icon = document.getElementById('refreshIcon');
@@ -501,11 +810,17 @@
 
       if (allItems.length === 0) {
         document.getElementById('loadingState').classList.remove('hidden');
-        document.getElementById('tableContainer').classList.add('hidden');
+        document.getElementById('dashboardContent').classList.add('hidden');
       }
       document.getElementById('errorState').classList.add('hidden');
 
-      const requestUrl = forceRefresh ? `${GAS_API_URL}?refresh=1` : GAS_API_URL;
+      const starsArr = Array.from(watchlist);
+      let requestUrl = GAS_API_URL;
+      if (forceRefresh) {
+        requestUrl = starsArr.length > 0
+          ? `${GAS_API_URL}?refresh=1&stars=${encodeURIComponent(starsArr.join(','))}`
+          : `${GAS_API_URL}?refresh=1`;
+      }
 
       fetch(requestUrl, { credentials: 'omit' })
         .then(response => {
@@ -516,30 +831,52 @@
           btn.disabled = false;
           icon.classList.remove('animate-spin');
           document.getElementById('loadingState').classList.add('hidden');
-          document.getElementById('tableContainer').classList.remove('hidden');
+          document.getElementById('dashboardContent').classList.remove('hidden');
 
           allItems = res.items || [];
           const badge = document.getElementById('statusBadge');
           badge.classList.remove('hidden');
           badge.classList.add('flex');
 
-          document.getElementById('lastUpdatedText').textContent =
-            `อัปเดต ${res.updatedAt} ${res.fromCache ? '(Cache)' : '(Live)'}`;
+          const isLiveStar = res.syncMode === 'STARRED_LIVE';
+          document.getElementById('statusDot').className = isLiveStar
+            ? 'h-2 w-2 animate-pulse rounded-full bg-emerald-400'
+            : 'h-2 w-2 rounded-full bg-amber-400';
+          document.getElementById('lastUpdatedText').textContent = isLiveStar
+            ? `อัปเดตสด ${res.syncedStarCount} ตัว (${res.updatedAt})`
+            : `ข้อมูลแคชทั้งตลาด (${res.updatedAt})`;
+
+          if (forceRefresh) {
+            if (isLiveStar) {
+              showToast(`⚡ อัปเดตราคาสดเฉพาะตัวติดดาว ${res.syncedStarCount} ตัวเรียบร้อยแล้ว!`);
+            } else if (res.syncMode === 'NO_STARS_CACHED') {
+              showToast('โหลดข้อมูลล่าสุดจากแคชแล้ว — กดติดดาว (★) หุ้นที่สนใจเพื่อเปิดโหมดอัปเดตสด');
+            }
+          }
 
           populateDropdowns(allItems);
           updateKPIs(allItems);
+          renderWatchlistDeck();
           applyFilters();
         })
         .catch(err => {
           btn.disabled = false;
           icon.classList.remove('animate-spin');
           document.getElementById('loadingState').classList.add('hidden');
-          document.getElementById('errorState').classList.remove('hidden');
-          document.getElementById('errorMessage').textContent = err.message || 'ไม่สามารถเชื่อมต่อกับ Google Sheets API ได้';
+          if (allItems.length === 0) {
+            document.getElementById('errorState').classList.remove('hidden');
+            document.getElementById('errorMessage').textContent = err.message || 'ไม่สามารถเชื่อมต่อกับ Google Sheets API ได้';
+          } else {
+            showToast('เชื่อมต่อชั่วคราวไม่สำเร็จ แสดงข้อมูลล่าสุดที่มีอยู่');
+          }
         });
     }
 
-    window.addEventListener('DOMContentLoaded', () => loadData(false));
+    window.addEventListener('DOMContentLoaded', () => {
+      initQuickGuideState();
+      updateWatchlistCounters();
+      loadData(false);
+    });
   </script>
 </body>
 </html>
