@@ -41,28 +41,24 @@
               DR Command Center
             </span>
           </div>
-          <p class="hidden text-xs text-slate-400 sm:block">สแกน Fair Value & ตั้งรับกระดาน SET แบบ 2 ความเร็ว</p>
+          <p class="hidden text-xs text-slate-400 sm:block">สแกน Fair Value • เช็กเวลาตลาดแม่ • กรองตาม 15 หมวดโบรกเกอร์</p>
         </div>
       </div>
 
       <div class="flex flex-wrap items-center gap-2">
-        <!-- ปุ่มเปิด/ปิด โพยย่อสรุป -->
-        <button id="toggleQuickGuideBtn" onclick="toggleQuickGuide()" class="inline-flex items-center gap-1 rounded-lg border border-amber-500/30 bg-amber-500/10 px-2.5 py-1.5 text-xs font-medium text-amber-300 transition hover:bg-amber-500/20" title="เปิด/ปิด โพยสรุปใช้งานจริง">
+        <button id="toggleQuickGuideBtn" onclick="toggleQuickGuide()" class="inline-flex items-center gap-1 rounded-lg border border-amber-500/30 bg-amber-500/10 px-2.5 py-1.5 text-xs font-medium text-amber-300 transition hover:bg-amber-500/20">
           <span>⚡ โพยย่อ</span>
         </button>
 
-        <!-- ปุ่มเปิด คู่มือละเอียด -->
-        <button onclick="openFullGuideModal()" class="inline-flex items-center gap-1 rounded-lg border border-slate-700 bg-slate-900 px-2.5 py-1.5 text-xs font-medium text-slate-300 transition hover:bg-slate-800 hover:text-white" title="อ่านคู่มือและสูตรคำนวณฉบับเต็ม">
+        <button onclick="openFullGuideModal()" class="inline-flex items-center gap-1 rounded-lg border border-slate-700 bg-slate-900 px-2.5 py-1.5 text-xs font-medium text-slate-300 transition hover:bg-slate-800 hover:text-white">
           <span>📖 คู่มือละเอียด</span>
         </button>
 
-        <!-- สถานะเวลาอัปเดต -->
         <div id="statusBadge" class="hidden items-center gap-1.5 rounded-lg border border-slate-800 bg-slate-900 px-2.5 py-1.5 text-xs text-slate-400 md:flex">
           <span id="statusDot" class="h-2 w-2 rounded-full bg-emerald-400"></span>
           <span id="lastUpdatedText">กำลังโหลด...</span>
         </div>
 
-        <!-- ปุ่มรีเฟรชอัจฉริยะ (ดึงสดเฉพาะตัวติดดาว) -->
         <button id="refreshBtn" onclick="loadData(true)" class="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-500 px-3 py-1.5 text-xs font-bold text-slate-950 shadow-md shadow-emerald-500/20 transition hover:brightness-110 active:scale-95 disabled:opacity-50">
           <svg id="refreshIcon" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -71,11 +67,16 @@
         </button>
       </div>
     </div>
+
+    <!-- Live Market Session Bar (แสดงเวลาเปิด-ปิดตลาดอัตโนมัติตามเวลาไทย GMT+7) -->
+    <div class="border-t border-slate-800/70 bg-slate-900/75 px-4 py-1.5 sm:px-6">
+      <div id="marketClockBar" class="mx-auto flex max-w-7xl flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-slate-300"></div>
+    </div>
   </header>
 
   <main class="mx-auto max-w-7xl px-4 py-4 sm:px-6">
 
-    <!-- 1. แถบโพยย่อสรุป (เน้นโชว์ตอนใช้งานจริง พับเก็บได้) -->
+    <!-- 1. แถบโพยย่อสรุป (พับเก็บได้) -->
     <section id="quickGuideBar" class="mb-5 rounded-2xl border border-amber-500/25 bg-gradient-to-r from-slate-900 via-slate-900 to-amber-950/20 p-3.5 shadow-lg">
       <div class="flex items-center justify-between gap-2 border-b border-slate-800/80 pb-2">
         <div class="flex items-center gap-2">
@@ -90,21 +91,21 @@
 
       <div class="mt-2.5 grid grid-cols-1 gap-2.5 text-xs sm:grid-cols-3">
         <div class="rounded-xl border border-slate-800/80 bg-slate-950/60 p-2.5">
-          <p class="font-semibold text-white">1. ติดดาว (★) ตัวที่เล็ง/ถือในพอร์ต</p>
-          <p class="mt-0.5 text-[11px] leading-relaxed text-slate-400">กดปุ่มสีเขียว <span class="font-semibold text-emerald-400">อัปเดตสด (★)</span> มุมขวาบน ระบบจะดึงราคาจริงเฉพาะตัวติดดาวใน <span class="text-slate-200">~2 วินาที</span> (ตัวอื่นทั้งตลาดอัปเดตอัตโนมัติทุก 5-10 นาที)</p>
+          <p class="font-semibold text-white">1. เช็กสถานะตลาดแม่ก่อนเคาะ</p>
+          <p class="mt-0.5 text-[11px] leading-relaxed text-slate-400"><span class="font-semibold text-emerald-400">🟢 ตลาดแม่วิ่งสด</span> = ราคาแม่ขยับจริงตามกระดาน • <span class="font-semibold text-indigo-300">🌙 อ้างอิงราคาปิด</span> = ตลาดแม่ปิดอยู่ ราคา DR ขยับตามค่าเงิน/Futures</p>
         </div>
         <div class="rounded-xl border border-slate-800/80 bg-slate-950/60 p-2.5">
-          <p class="font-semibold text-white">2. เช็กป้ายโซนราคาก่อนเคาะ</p>
-          <p class="mt-0.5 text-[11px] leading-relaxed text-slate-400"><span class="font-semibold text-emerald-400">🟢 น่าสะสม</span> = ราคา SET ≤ โซนตั้งรับ (ถูกกว่าแม่) • <span class="text-slate-200">⚪ เหมาะสม</span> = ไม่เกิน Fair • <span class="text-rose-400">🔴 แพงกว่าแม่</span> = ควรรอ</p>
+          <p class="font-semibold text-white">2. กรองตาม 15 หมวด & โซนราคา</p>
+          <p class="mt-0.5 text-[11px] leading-relaxed text-slate-400">เลือกหมวดธุรกิจ (เช่น <span class="text-slate-200">เทคโนโลยี, สุขภาพ, สินค้าจำเป็น</span>) คู่กับปุ่ม <span class="font-semibold text-emerald-400">🟢 น่าสะสม</span> เพื่อหาตัวถูกกว่าแม่ในกลุ่มที่ต้องการ</p>
         </div>
         <div class="rounded-xl border border-slate-800/80 bg-slate-950/60 p-2.5">
-          <p class="font-semibold text-white">3. จิ้มแถว/การ์ด เพื่อจำลองตั้ง Bid</p>
-          <p class="mt-0.5 text-[11px] leading-relaxed text-slate-400">กดที่หุ้นตัวใดก็ได้เพื่อปรับราคา +/- 1 ช่องตามเกณฑ์ <span class="text-slate-200">Tick Size ใหม่</span> และดูเงินขั้นต่ำต่อ 100 หน่วย</p>
+          <p class="font-semibold text-white">3. ติดดาว (★) + อัปเดตสด 2 วินาที</p>
+          <p class="mt-0.5 text-[11px] leading-relaxed text-slate-400">กดปุ่มสีเขียว <span class="font-semibold text-emerald-400">อัปเดตสด (★)</span> เพื่อดึงราคาเฉพาะกลุ่มติดดาวทันที และจิ้มแถวเพื่อจำลองตั้ง Bid ตามเกณฑ์ Tick Size ใหม่</p>
         </div>
       </div>
     </section>
 
-    <!-- Toast แจ้งเตือนสั้นๆ -->
+    <!-- Toast แจ้งเตือน -->
     <div id="toastBanner" class="mb-4 hidden items-center justify-between rounded-xl border border-emerald-500/30 bg-emerald-950/40 px-4 py-2.5 text-xs text-emerald-200">
       <span id="toastText">อัปเดตข้อมูลสำเร็จ</span>
       <button onclick="document.getElementById('toastBanner').classList.add('hidden')" class="text-emerald-400 hover:text-white">✕</button>
@@ -127,14 +128,14 @@
     <!-- Main Dashboard Content -->
     <div id="dashboardContent" class="hidden space-y-6">
 
-      <!-- 2. โซนตัวติดดาวของฉัน (Watchlist Command Deck - เด่นสุดด้านบน) -->
+      <!-- 2. โซนตัวติดดาวของฉัน (Watchlist Command Deck) -->
       <section class="rounded-2xl border border-amber-500/25 bg-gradient-to-b from-slate-900/90 to-slate-900/50 p-4 shadow-xl">
         <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-3">
           <div class="flex items-center gap-2">
             <span class="text-base text-amber-400">★</span>
             <div>
               <h2 class="text-sm font-bold text-white">กระดานตัวติดดาวของฉัน (<span id="watchlistHeaderCount">0</span> ตัว)</h2>
-              <p class="text-[11px] text-slate-400">กลุ่มที่กดปุ่ม "อัปเดตสด" แล้วดึงราคาหุ้นแม่และกระดาน SET ทันที</p>
+              <p class="text-[11px] text-slate-400">แสดงสถานะเปิด-ปิดตลาดแม่ ป้ายหมวดธุรกิจ และราคา Fair Value แบบเรียลไทม์</p>
             </div>
           </div>
 
@@ -143,18 +144,16 @@
           </button>
         </div>
 
-        <!-- กรณีมีตัวติดดาว: แสดงเป็น Grid การ์ดสวยๆ อ่านง่ายทั้งมือถือและคอม -->
         <div id="watchlistCardsGrid" class="mt-3.5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3"></div>
 
-        <!-- กรณียังไม่มีตัวติดดาว: แสดงคำแนะนำ + ปุ่มติดดาวด่วน -->
         <div id="watchlistEmptyPrompt" class="mt-3.5 rounded-xl border border-dashed border-slate-700 bg-slate-950/60 p-5 text-center">
           <p class="text-xs font-semibold text-slate-200">ยังไม่มีรายการติดดาวในพอร์ตของคุณ</p>
-          <p class="mt-1 text-[11px] text-slate-400">กดรูปดาว <span class="text-amber-400">☆</span> หน้าชื่อหุ้นในตารางด้านล่าง หรือเลือกจากตัวแนะนำด้านล่างนี้ เพื่อเปิดโหมดอัปเดตสด 2 วินาที:</p>
+          <p class="mt-1 text-[11px] text-slate-400">กดรูปดาว <span class="text-amber-400">☆</span> หน้าชื่อหุ้นในตารางด้านล่าง หรือเลือกจากตัวแนะนำด้านล่างนี้:</p>
           <div id="quickStarChips" class="mt-3 flex flex-wrap justify-center gap-1.5"></div>
         </div>
       </section>
 
-      <!-- 3. KPI Summary Cards ทั้งตลาด -->
+      <!-- 3. KPI Summary Cards -->
       <section class="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <div class="rounded-xl border border-slate-800/80 bg-slate-900/70 p-3.5">
           <p class="text-xs text-slate-400">DR ในฐานข้อมูลทั้งหมด</p>
@@ -174,7 +173,7 @@
         </div>
       </section>
 
-      <!-- 4. ตารางสแกนกระดานทั้งหมด (Full Market Screener) -->
+      <!-- 4. ตารางสแกนกระดานทั้งหมด -->
       <section class="space-y-3">
         <div class="flex flex-col gap-3 rounded-xl border border-slate-800/80 bg-slate-900/60 p-3.5">
           <div class="flex flex-wrap items-center justify-between gap-3">
@@ -188,21 +187,25 @@
             </div>
 
             <div class="relative w-full sm:w-64">
-              <input id="searchInput" type="text" oninput="applyFilters()" placeholder="ค้นหา DR, หุ้นแม่, ตลาด..." class="w-full rounded-lg border border-slate-700/80 bg-slate-950 py-1.5 pl-8 pr-3 text-xs text-white placeholder-slate-500 focus:border-emerald-500 focus:outline-none" />
+              <input id="searchInput" type="text" oninput="applyFilters()" placeholder="ค้นหา DR, หุ้นแม่, หมวดหมู่..." class="w-full rounded-lg border border-slate-700/80 bg-slate-950 py-1.5 pl-8 pr-3 text-xs text-white placeholder-slate-500 focus:border-emerald-500 focus:outline-none" />
               <svg class="absolute left-2.5 top-2 h-3.5 w-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 103.5 10.5a7.5 7.5 0 0013.15 6.15z" />
               </svg>
             </div>
           </div>
 
-          <div class="flex flex-wrap items-center gap-2 border-t border-slate-800/60 pt-2">
+          <!-- แถบกรองโซนราคา + หมวดหมู่ + ค่าย + ตลาด -->
+          <div class="flex flex-wrap items-center gap-2 border-t border-slate-800/60 pt-2.5">
             <span class="text-[11px] font-medium text-slate-400">โซนราคา:</span>
             <button onclick="setZoneFilter('ALL')" data-zone="ALL" class="zone-btn rounded-full border border-emerald-500/40 bg-emerald-500/20 px-2.5 py-0.5 text-[11px] font-medium text-emerald-300">ทั้งหมด</button>
             <button onclick="setZoneFilter('DISCOUNT')" data-zone="DISCOUNT" class="zone-btn rounded-full border border-slate-700 bg-slate-800/80 px-2.5 py-0.5 text-[11px] font-medium text-slate-300 hover:bg-slate-700">🟢 น่าสะสม</button>
             <button onclick="setZoneFilter('FAIR')" data-zone="FAIR" class="zone-btn rounded-full border border-slate-700 bg-slate-800/80 px-2.5 py-0.5 text-[11px] font-medium text-slate-300 hover:bg-slate-700">⚪ ราคาเหมาะสม</button>
             <button onclick="setZoneFilter('PREMIUM')" data-zone="PREMIUM" class="zone-btn rounded-full border border-slate-700 bg-slate-800/80 px-2.5 py-0.5 text-[11px] font-medium text-slate-300 hover:bg-slate-700">🔴 แพงกว่าแม่</button>
 
-            <div class="ml-auto flex items-center gap-2">
+            <div class="ml-auto flex flex-wrap items-center gap-2">
+              <select id="sectorFilter" onchange="applyFilters()" class="rounded-lg border border-indigo-500/40 bg-slate-950 px-2.5 py-1 text-[11px] font-medium text-indigo-200 focus:border-emerald-500 focus:outline-none">
+                <option value="ALL">ทุกหมวดหมู่ (15 กลุ่ม)</option>
+              </select>
               <select id="issuerFilter" onchange="applyFilters()" class="rounded-lg border border-slate-700/80 bg-slate-950 px-2.5 py-1 text-[11px] text-slate-300 focus:border-emerald-500 focus:outline-none">
                 <option value="ALL">ทุกค่าย DR</option>
               </select>
@@ -219,7 +222,7 @@
               <thead>
                 <tr class="border-b border-slate-800 bg-slate-950/80 text-[11px] uppercase tracking-wider text-slate-400">
                   <th class="w-10 px-3 py-3 text-center">★</th>
-                  <th class="cursor-pointer px-3 py-3 hover:text-white" onclick="sortBy('drSymbol')">DR / ตลาด ⇅</th>
+                  <th class="cursor-pointer px-3 py-3 hover:text-white" onclick="sortBy('drSymbol')">DR / หมวดหมู่ / ตลาดแม่ ⇅</th>
                   <th class="px-3 py-3 text-right">Ratio</th>
                   <th class="px-3 py-3 text-right">หุ้นแม่ (Parent)</th>
                   <th class="px-3 py-3 text-right">FX (THB)</th>
@@ -251,6 +254,7 @@
             <span id="modalMarket" class="rounded bg-slate-800 px-2 py-0.5 text-[11px] text-slate-300">NASDAQ</span>
           </div>
           <p id="modalSubtitle" class="mt-0.5 text-xs text-slate-400">Ratio 1:1,000 • Tick Size 0.05 ฿</p>
+          <div id="modalSectors" class="mt-1.5 flex flex-wrap gap-1"></div>
         </div>
         <button onclick="hideModal('calcModal')" class="rounded-lg p-1 text-slate-400 hover:bg-slate-800 hover:text-white">✕</button>
       </div>
@@ -294,77 +298,73 @@
     </div>
   </div>
 
-  <!-- Modal 2: คู่มือการใช้งานฉบับละเอียด (สำหรับตอนมีเวลานั่งอ่าน) -->
+  <!-- Modal 2: คู่มือการใช้งานฉบับละเอียด -->
   <div id="fullGuideModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/85 p-4 backdrop-blur-sm" onclick="if(event.target.id==='fullGuideModal') hideModal('fullGuideModal')">
     <div class="flex max-h-[88vh] w-full max-w-2xl flex-col rounded-2xl border border-slate-700/80 bg-slate-900 shadow-2xl">
-      <!-- Header -->
       <div class="flex items-center justify-between border-b border-slate-800 px-5 py-4">
         <div>
           <h3 class="text-base font-bold text-white">📖 คู่มือการใช้งาน MyWealth DR Command Center (ฉบับละเอียด)</h3>
-          <p class="mt-0.5 text-xs text-slate-400">เข้าใจกลไกการทำงาน สูตรคำนวณ Fair Value และเกณฑ์ Tick Size ใหม่</p>
+          <p class="mt-0.5 text-xs text-slate-400">เวลาเปิด-ปิดตลาดต่างประเทศ • 15 หมวดมาตรฐานโบรกเกอร์ • เกณฑ์ Tick Size ใหม่</p>
         </div>
         <button onclick="hideModal('fullGuideModal')" class="rounded-lg p-1.5 text-slate-400 hover:bg-slate-800 hover:text-white">✕</button>
       </div>
 
-      <!-- Scrollable Body -->
       <div class="space-y-5 overflow-y-auto px-5 py-4 text-xs leading-relaxed text-slate-300">
         
-        <div class="rounded-xl border border-emerald-500/25 bg-emerald-950/15 p-4">
-          <h4 class="text-sm font-bold text-emerald-400">1. ระบบทำงานแบบ 2 ความเร็ว (ทำไมต้องแยก "ตัวติดดาว" กับ "แคชทั้งตลาด")</h4>
-          <p class="mt-1.5 text-slate-300">เมื่อฐานข้อมูล DR มีจำนวนมาก (141 ถึง 400+ ตัว) การดึงราคาหุ้นต่างประเทศทั้งหมดพร้อมกันในคราวเดียวจะใช้เวลาราว 40–90 วินาที ซึ่งเกินขีดจำกัดการรอของหน้าเว็บ ระบบจึงถูกออกแบบแยกเป็น 2 ส่วน:</p>
-          <ul class="mt-2 list-disc space-y-1.5 pl-5 text-slate-300">
-            <li><strong class="text-white">โหมดดึงสดตัวติดดาว (Starred Live Sync):</strong> เมื่อคุณกดรูปดาว <span class="text-amber-400">★</span> หน้าชื่อหุ้นที่ถือหรือเล็งไว้ แล้วกดปุ่ม <strong class="text-emerald-400">อัปเดตสด (★)</strong> หน้าเว็บจะส่งเฉพาะรายชื่อกลุ่มนี้ไปดึงราคาหุ้นแม่, ราคาบน SET และค่าเงินแบบเรียลไทม์ ใช้เวลาเพียง <strong class="text-white">1.5 – 3 วินาที</strong></li>
-            <li><strong class="text-white">โหมดสแกนทั้งตลาดเบื้องหลัง (Background Cache):</strong> Google Apps Script จะทยอยดึงข้อมูลครบทุกตัวในชีตให้อัตโนมัติทุกๆ 5–10 นาที (ตามเวลาที่คุณตั้งใน Trigger) แล้วเก็บลงแท็บซ่อน <code class="rounded bg-slate-800 px-1 py-0.5 text-amber-300">_CACHE_JSON</code> ทำให้เปิดหน้าเว็บเมื่อไหร่ก็เห็นข้อมูลทั้งตลาดทันทีในไม่ถึง 0.5 วินาที</li>
-          </ul>
-        </div>
-
-        <div class="rounded-xl border border-slate-800 bg-slate-950/70 p-4">
-          <h4 class="text-sm font-bold text-white">2. สูตรคำนวณ Fair Value และความหมายของป้ายสถานะ</h4>
-          <div class="mt-2 rounded-lg border border-slate-800 bg-slate-900 p-2.5 text-center font-mono text-xs text-emerald-300">
-            Fair Value (บาท) = (ราคาหุ้นแม่ต่างประเทศ × อัตราแลกเปลี่ยน) ÷ Ratio
-          </div>
-          <ul class="mt-2.5 space-y-2 text-slate-300">
-            <li><span class="rounded bg-emerald-500/20 px-1.5 py-0.5 font-semibold text-emerald-400">🟢 น่าสะสม (Discount)</span> : ราคาบนกระดาน SET ต่ำกว่าหรือเท่ากับ <strong>โซนตั้งรับ (Fair Value ลบ 1 Tick)</strong> หมายความว่าซื้อได้ถูกกว่ามูลค่าหุ้นแม่จริง (ค่า Prem/Disc ติดลบ)</li>
-            <li><span class="rounded bg-slate-800 px-1.5 py-0.5 font-semibold text-slate-200">⚪ ราคาเหมาะสม (Fair)</span> : ราคาบนกระดานอยู่ระหว่างโซนตั้งรับจนถึงราคา Fair Value พอดี เป็นราคายุติธรรมสำหรับทยอยสะสม</li>
-            <li><span class="rounded bg-rose-500/20 px-1.5 py-0.5 font-semibold text-rose-400">🔴 แพงกว่าแม่ (Premium)</span> : ราคาบนกระดานสูงกว่า Fair Value จริง หากไม่รีบควรตั้ง Bid รอในโซนสีเขียวแทนการเคาะขวา</li>
-          </ul>
-        </div>
-
-        <div class="rounded-xl border border-slate-800 bg-slate-950/70 p-4">
-          <h4 class="text-sm font-bold text-white">3. เกณฑ์ช่วงราคา (Tick Size) ใหม่ของ SET (บังคับใช้ 16 พ.ย. 2569)</h4>
-          <p class="mt-1 text-slate-400">ระบบคำนวณโซนตั้งรับและการปุ่ม +/- 1 Tick ในเครื่องคิดเลขตามเกณฑ์ใหม่ของตลาดหลักทรัพย์ฯ แล้ว:</p>
+        <div class="rounded-xl border border-sky-500/25 bg-sky-950/15 p-4">
+          <h4 class="text-sm font-bold text-sky-300">1. ตารางเวลาเปิด-ปิดตลาดเทียบเวลาไทย (GMT+7)</h4>
+          <p class="mt-1 text-slate-300">ระบบคำนวณเวลาเปิด-ปิดตลาดแต่ละประเทศอัตโนมัติ (รวมปรับเวลาออมแสง DST ของสหรัฐฯ/ยุโรปให้แล้ว):</p>
           <div class="mt-2.5 overflow-hidden rounded-lg border border-slate-800">
             <table class="w-full text-left text-[11px]">
               <thead class="bg-slate-900 text-slate-400">
                 <tr>
-                  <th class="px-3 py-2">ช่วงราคาหุ้น / DR (บาท)</th>
-                  <th class="px-3 py-2 text-right">ช่วงราคาใหม่ (Tick Size)</th>
-                  <th class="px-3 py-2 text-right">เทียบเกณฑ์เดิม</th>
+                  <th class="px-3 py-2">ตลาดหลักทรัพย์</th>
+                  <th class="px-3 py-2">เวลาซื้อขาย (เวลาไทย)</th>
+                  <th class="px-3 py-2">พฤติกรรมราคา DR บนกระดาน SET</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-slate-800/80 text-slate-300">
-                <tr><td class="px-3 py-1.5">ต่ำกว่า 2.00</td><td class="px-3 py-1.5 text-right font-semibold text-white">0.01</td><td class="px-3 py-1.5 text-right text-slate-500">0.01 (คงเดิม)</td></tr>
-                <tr class="bg-emerald-950/10"><td class="px-3 py-1.5">2.00 – 9.98</td><td class="px-3 py-1.5 text-right font-bold text-emerald-400">0.02</td><td class="px-3 py-1.5 text-right text-slate-400">เดิมช่วง 5-10 บาท ใช้ 0.05</td></tr>
-                <tr class="bg-emerald-950/10"><td class="px-3 py-1.5">10.00 – 24.95</td><td class="px-3 py-1.5 text-right font-bold text-emerald-400">0.05</td><td class="px-3 py-1.5 text-right text-slate-400">เดิม 0.10</td></tr>
-                <tr class="bg-emerald-950/10"><td class="px-3 py-1.5">25.00 – 49.90</td><td class="px-3 py-1.5 text-right font-bold text-emerald-400">0.10</td><td class="px-3 py-1.5 text-right text-slate-400">เดิม 0.25</td></tr>
-                <tr><td class="px-3 py-1.5">50.00 – 99.75</td><td class="px-3 py-1.5 text-right font-semibold text-white">0.25</td><td class="px-3 py-1.5 text-right text-slate-500">0.25 (คงเดิม)</td></tr>
-                <tr><td class="px-3 py-1.5">100.00 – 199.50</td><td class="px-3 py-1.5 text-right font-semibold text-white">0.50</td><td class="px-3 py-1.5 text-right text-slate-500">0.50 (คงเดิม)</td></tr>
+                <tr><td class="px-3 py-1.5 font-semibold text-white">🇹🇭 SET (กระดาน DR)</td><td class="px-3 py-1.5">10:00–16:30 / 19:00–02:45</td><td class="px-3 py-1.5 text-slate-400">เทรดได้ทั้งกลางวันและกลางคืน</td></tr>
+                <tr><td class="px-3 py-1.5 font-semibold text-white">🇭🇰 ฮ่องกง / 🇨🇳 จีน</td><td class="px-3 py-1.5">08:30–15:00 น.</td><td class="px-3 py-1.5 text-emerald-400">วิ่งสดพร้อมกระดานไทยช่วงกลางวัน</td></tr>
+                <tr><td class="px-3 py-1.5 font-semibold text-white">🇯🇵 ญี่ปุ่น (TSE)</td><td class="px-3 py-1.5">07:00–13:30 น.</td><td class="px-3 py-1.5 text-emerald-400">วิ่งสดพร้อมกระดานไทยช่วงเช้า-บ่ายต้น</td></tr>
+                <tr><td class="px-3 py-1.5 font-semibold text-white">🇪🇺 ยุโรป (Euronext)</td><td class="px-3 py-1.5">14:00/15:00–22:30/23:30 น.</td><td class="px-3 py-1.5 text-amber-300">เปิดช่วงบ่ายแก่ถึงรอบกลางคืน</td></tr>
+                <tr><td class="px-3 py-1.5 font-semibold text-white">🇺🇸 สหรัฐฯ (NYSE/NASDAQ)</td><td class="px-3 py-1.5">20:30/21:30–03:00/04:00 น.</td><td class="px-3 py-1.5 text-indigo-300">กลางวันอิงราคาปิดเมื่อคืน / วิ่งสดรอบกลางคืน</td></tr>
               </tbody>
             </table>
           </div>
         </div>
 
+        <div class="rounded-xl border border-emerald-500/25 bg-emerald-950/15 p-4">
+          <h4 class="text-sm font-bold text-emerald-400">2. การจัดกลุ่มตาม 15 หมวดมาตรฐานโบรกเกอร์ (คอลัมน์ F)</h4>
+          <p class="mt-1 text-slate-300">คุณสามารถพิมพ์หมวดหมู่ลงในคอลัมน์ F ของ Google Sheets ได้โดยตรง (ใส่ได้หลายหมวดคั่นด้วยลูกน้ำ <code class="rounded bg-slate-800 px-1 text-amber-300">,</code>) โดยระบบรองรับครบทั้ง 15 หมวดมาตรฐาน:</p>
+          <p class="mt-1.5 rounded-lg border border-slate-800 bg-slate-950/80 p-2.5 text-[11px] text-slate-300">
+            เทคโนโลยี • วัสดุพื้นฐาน • การสื่อสาร • สินค้าฟุ่มเฟือย • สินค้าจำเป็น • สุขภาพ • อุตสาหกรรม • อสังหาริมทรัพย์ • สาธารณูปโภค • ธุรกิจการเงิน • เกษตรและอุตสาหกรรมอาหาร • สินค้าอุปโภคบริโภค • ก่อสร้าง • ทรัพยากร • บริการ (และ ดัชนี / ETF)
+          </p>
+        </div>
+
         <div class="rounded-xl border border-slate-800 bg-slate-950/70 p-4">
-          <h4 class="text-sm font-bold text-white">4. วิธีเพิ่ม DR ค่ายอื่นๆ ใน Google Sheets & ปักหมุดเป็นแอป</h4>
-          <ul class="mt-1.5 list-disc space-y-1.5 pl-5 text-slate-300">
-            <li><strong class="text-white">เพิ่มรายชื่อ DR ใหม่:</strong> พิมพ์ต่อท้ายในแท็บ <code class="rounded bg-slate-800 px-1 py-0.5 text-amber-300">DR</code> โดยระบุให้ครบ 5 คอลัมน์ (<code class="text-slate-200">DR | Ratio | ตลาดอ้างอิง | Ticker | Currency</code>) เช่น <code class="text-slate-200">ASML01 | 1:100 | Euronext | ASML.AS | EUR</code> หรือ <code class="text-slate-200">JEPI19 | 1:100 | NYSE | JEPI | USD</code></li>
-            <li><strong class="text-white">ระวังช่องว่างท้ายคำ:</strong> อย่าให้มีเว้นวรรคต่อท้ายชื่อ Ticker (ระบบจะตัดให้อัตโนมัติ แต่พิมพ์ให้ชิดจะดีที่สุด)</li>
-            <li><strong class="text-white">ใช้งานแบบแอปบนมือถือ:</strong> เปิดหน้านี้ผ่าน Chrome → กดปุ่ม <strong>⋮ (มุมขวาบน)</strong> → เลือก <strong>เพิ่มลงในหน้าจอหลัก (Add to Home Screen)</strong></li>
-          </ul>
+          <h4 class="text-sm font-bold text-white">3. เกณฑ์ช่วงราคา (Tick Size) ใหม่ของ SET (16 พ.ย. 2569)</h4>
+          <div class="mt-2 overflow-hidden rounded-lg border border-slate-800">
+            <table class="w-full text-left text-[11px]">
+              <thead class="bg-slate-900 text-slate-400">
+                <tr>
+                  <th class="px-3 py-2">ช่วงราคา DR (บาท)</th>
+                  <th class="px-3 py-2 text-right">Tick Size ใหม่</th>
+                  <th class="px-3 py-2 text-right">เทียบเกณฑ์เดิม</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-800/80 text-slate-300">
+                <tr><td class="px-3 py-1.5">ต่ำกว่า 2.00</td><td class="px-3 py-1.5 text-right font-semibold text-white">0.01</td><td class="px-3 py-1.5 text-right text-slate-500">0.01</td></tr>
+                <tr class="bg-emerald-950/10"><td class="px-3 py-1.5">2.00 – 9.98</td><td class="px-3 py-1.5 text-right font-bold text-emerald-400">0.02</td><td class="px-3 py-1.5 text-right text-slate-400">เดิมช่วง 5-10 ใช้ 0.05</td></tr>
+                <tr class="bg-emerald-950/10"><td class="px-3 py-1.5">10.00 – 24.95</td><td class="px-3 py-1.5 text-right font-bold text-emerald-400">0.05</td><td class="px-3 py-1.5 text-right text-slate-400">เดิม 0.10</td></tr>
+                <tr class="bg-emerald-950/10"><td class="px-3 py-1.5">25.00 – 49.90</td><td class="px-3 py-1.5 text-right font-bold text-emerald-400">0.10</td><td class="px-3 py-1.5 text-right text-slate-400">เดิม 0.25</td></tr>
+                <tr><td class="px-3 py-1.5">50.00 – 99.75</td><td class="px-3 py-1.5 text-right font-semibold text-white">0.25</td><td class="px-3 py-1.5 text-right text-slate-500">0.25</td></tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
-      <!-- Footer -->
       <div class="border-t border-slate-800 px-5 py-3 text-right">
         <button onclick="hideModal('fullGuideModal')" class="rounded-lg bg-emerald-500 px-4 py-1.5 text-xs font-bold text-slate-950 hover:brightness-110">เข้าใจแล้ว ปิดคู่มือ</button>
       </div>
@@ -372,7 +372,6 @@
   </div>
 
   <script>
-    // ลิงก์ API จาก Google Apps Script ของคุณ
     const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbyMRvJRIASXpFhRIkIm8yJGe0rexG4N0BOxXeBoLjGzLEmXlq9KRq9YmfeF8LZG5cnt/exec';
 
     let allItems = [];
@@ -385,6 +384,213 @@
     const QUICK_GUIDE_KEY = 'mywealth_quick_guide_visible_v1';
     let watchlist = new Set(JSON.parse(localStorage.getItem(WATCHLIST_KEY) || '[]'));
 
+    // 15 หมวดมาตรฐานตามโบรกเกอร์ + สีป้ายกำกับ
+    const SECTOR_STYLES = {
+      'เทคโนโลยี': 'border-cyan-500/30 bg-cyan-500/15 text-cyan-300',
+      'วัสดุพื้นฐาน': 'border-stone-500/30 bg-stone-500/15 text-stone-300',
+      'การสื่อสาร': 'border-violet-500/30 bg-violet-500/15 text-violet-300',
+      'สินค้าฟุ่มเฟือย': 'border-pink-500/30 bg-pink-500/15 text-pink-300',
+      'สินค้าจำเป็น': 'border-emerald-500/30 bg-emerald-500/15 text-emerald-300',
+      'สุขภาพ': 'border-teal-500/30 bg-teal-500/15 text-teal-300',
+      'อุตสาหกรรม': 'border-orange-500/30 bg-orange-500/15 text-orange-300',
+      'อสังหาริมทรัพย์': 'border-amber-500/30 bg-amber-500/15 text-amber-300',
+      'สาธารณูปโภค': 'border-sky-500/30 bg-sky-500/15 text-sky-300',
+      'ธุรกิจการเงิน': 'border-blue-500/30 bg-blue-500/15 text-blue-300',
+      'เกษตรและอุตสาหกรรมอาหาร': 'border-lime-500/30 bg-lime-500/15 text-lime-300',
+      'สินค้าอุปโภคบริโภค': 'border-green-500/30 bg-green-500/15 text-green-300',
+      'ก่อสร้าง': 'border-yellow-600/30 bg-yellow-600/15 text-yellow-300',
+      'ทรัพยากร': 'border-red-500/30 bg-red-500/15 text-red-300',
+      'บริการ': 'border-indigo-500/30 bg-indigo-500/15 text-indigo-300',
+      'ดัชนี / ETF': 'border-purple-500/30 bg-purple-500/15 text-purple-300'
+    };
+
+    function renderSectorBadges(sectors) {
+      const list = Array.isArray(sectors) && sectors.length > 0 ? sectors : ['อื่นๆ'];
+      return list.map(sec => {
+        const cls = SECTOR_STYLES[sec] || 'border-slate-700 bg-slate-800/80 text-slate-300';
+        return `<span class="inline-block rounded border px-1.5 py-0.5 text-[10px] font-medium ${cls}">${sec}</span>`;
+      }).join(' ');
+    }
+
+    // ==========================================
+    // ระบบคำนวณเวลาเปิด-ปิดตลาดตาม Timezone จริง (รองรับ DST อัตโนมัติ)
+    // ==========================================
+    function getLocalTimeParts(timeZone) {
+      const parts = new Intl.DateTimeFormat('en-US', {
+        timeZone: timeZone,
+        weekday: 'short',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      }).formatToParts(new Date());
+
+      const map = {};
+      parts.forEach(p => { map[p.type] = p.value; });
+      const hour = Number(map.hour === '24' ? 0 : map.hour);
+      const minute = Number(map.minute);
+      return {
+        weekday: map.weekday,
+        minutesOfDay: hour * 60 + minute
+      };
+    }
+
+    function getSetDrSessionStatus() {
+      const t = getLocalTimeParts('Asia/Bangkok');
+      const isWeekend = t.weekday === 'Sat' || t.weekday === 'Sun';
+      const m = t.minutesOfDay;
+
+      // รอบกลางคืนของคืนวันศุกร์ (ลากข้ามมาเช้าวันเสาร์ 00:00 - 02:45)
+      if (t.weekday === 'Sat' && m <= 2 * 60 + 45) {
+        return { isOpen: true, label: '🇹🇭 SET DR: 🟢 เปิดรอบกลางคืน (ถึง 02:45)' };
+      }
+      if (isWeekend) {
+        return { isOpen: false, label: '🇹🇭 SET DR: 🌙 ปิดตลาด (วันหยุด)' };
+      }
+      // รอบเช้า 10:00 - 12:30
+      if (m >= 10 * 60 && m <= 12 * 60 + 30) {
+        return { isOpen: true, label: '🇹🇭 SET DR: 🟢 เปิดรอบเช้า (10:00–12:30)' };
+      }
+      // พักเที่ยง 12:31 - 13:59
+      if (m > 12 * 60 + 30 && m < 14 * 60) {
+        return { isOpen: false, label: '🇹🇭 SET DR: ⏸️ พักเที่ยง (เปิด 14:00)' };
+      }
+      // รอบบ่าย 14:00 - 16:30
+      if (m >= 14 * 60 && m <= 16 * 60 + 30) {
+        return { isOpen: true, label: '🇹🇭 SET DR: 🟢 เปิดรอบบ่าย (14:00–16:30)' };
+      }
+      // รอบกลางคืน 19:00 - 02:45 (รวมช่วง 00:00-02:45 ของอังคาร-ศุกร์)
+      if (m >= 19 * 60 || (t.weekday !== 'Mon' && m <= 2 * 60 + 45)) {
+        return { isOpen: true, label: '🇹🇭 SET DR: 🟢 เปิดรอบกลางคืน (19:00–02:45)' };
+      }
+      return { isOpen: false, label: '🇹🇭 SET DR: ⏳ รอบถัดไป 19:00 น.' };
+    }
+
+    function checkSessionOpen(timeZone, sessions) {
+      const t = getLocalTimeParts(timeZone);
+      if (t.weekday === 'Sat' || t.weekday === 'Sun') return 'CLOSED';
+      const m = t.minutesOfDay;
+      for (const s of sessions) {
+        if (m >= s.start && m <= s.end) return s.state;
+      }
+      return 'CLOSED';
+    }
+
+    function getParentMarketStatus(market, currency) {
+      const m = String(market || '').toUpperCase();
+      const c = String(currency || '').toUpperCase();
+
+      // 1. สหรัฐฯ (NYSE / NASDAQ)
+      if (m.includes('NASDAQ') || m.includes('NYSE') || m.includes('US') || m.includes('BATS') || c === 'USD') {
+        const st = checkSessionOpen('America/New_York', [{ start: 9 * 60 + 30, end: 16 * 60, state: 'OPEN' }]);
+        return st === 'OPEN'
+          ? { state: 'OPEN', shortBadge: '🟢 แม่วิ่งสด', color: 'text-emerald-400', thaiHours: '20:30/21:30–03:00/04:00' }
+          : { state: 'CLOSED', shortBadge: '🌙 ราคาปิดเมื่อคืน', color: 'text-indigo-300', thaiHours: 'เปิด 20:30/21:30 น.' };
+      }
+
+      // 2. ฮ่องกง (HKEX)
+      if (m.includes('HK') || m.includes('HONG') || c === 'HKD') {
+        const st = checkSessionOpen('Asia/Hong_Kong', [
+          { start: 9 * 60 + 30, end: 12 * 60, state: 'OPEN' },
+          { start: 12 * 60 + 1, end: 12 * 60 + 59, state: 'LUNCH' },
+          { start: 13 * 60, end: 16 * 60, state: 'OPEN' }
+        ]);
+        if (st === 'OPEN') return { state: 'OPEN', shortBadge: '🟢 แม่วิ่งสด', color: 'text-emerald-400', thaiHours: '08:30–15:00 น.' };
+        if (st === 'LUNCH') return { state: 'LUNCH', shortBadge: '⏸️ พักเที่ยง', color: 'text-amber-300', thaiHours: 'เปิดบ่าย 12:00 น.' };
+        return { state: 'CLOSED', shortBadge: '🌙 ตลาดแม่ปิด', color: 'text-slate-400', thaiHours: '08:30–15:00 น.' };
+      }
+
+      // 3. จีนแผ่นดินใหญ่ (Shanghai / Shenzhen)
+      if (m.includes('SHANGHAI') || m.includes('SHENZHEN') || m.includes('SSE') || m.includes('SZSE') || m.includes('CHINA') || c === 'CNY' || c === 'CNH') {
+        const st = checkSessionOpen('Asia/Shanghai', [
+          { start: 9 * 60 + 30, end: 11 * 60 + 30, state: 'OPEN' },
+          { start: 11 * 60 + 31, end: 12 * 60 + 59, state: 'LUNCH' },
+          { start: 13 * 60, end: 15 * 60, state: 'OPEN' }
+        ]);
+        if (st === 'OPEN') return { state: 'OPEN', shortBadge: '🟢 แม่วิ่งสด', color: 'text-emerald-400', thaiHours: '08:30–14:00 น.' };
+        if (st === 'LUNCH') return { state: 'LUNCH', shortBadge: '⏸️ พักเที่ยง', color: 'text-amber-300', thaiHours: 'เปิดบ่าย 12:00 น.' };
+        return { state: 'CLOSED', shortBadge: '🌙 ตลาดแม่ปิด', color: 'text-slate-400', thaiHours: '08:30–14:00 น.' };
+      }
+
+      // 4. ญี่ปุ่น (TSE / TYO)
+      if (m.includes('TOKYO') || m.includes('TSE') || m.includes('TYO') || m.includes('JAPAN') || c === 'JPY') {
+        const st = checkSessionOpen('Asia/Tokyo', [
+          { start: 9 * 60, end: 11 * 60 + 30, state: 'OPEN' },
+          { start: 11 * 60 + 31, end: 12 * 60 + 29, state: 'LUNCH' },
+          { start: 12 * 60 + 30, end: 15 * 60 + 30, state: 'OPEN' }
+        ]);
+        if (st === 'OPEN') return { state: 'OPEN', shortBadge: '🟢 แม่วิ่งสด', color: 'text-emerald-400', thaiHours: '07:00–13:30 น.' };
+        if (st === 'LUNCH') return { state: 'LUNCH', shortBadge: '⏸️ พักเที่ยง', color: 'text-amber-300', thaiHours: 'เปิดบ่าย 10:30 น.' };
+        return { state: 'CLOSED', shortBadge: '🌙 ตลาดแม่ปิด', color: 'text-slate-400', thaiHours: '07:00–13:30 น.' };
+      }
+
+      // 5. ยุโรป (Euronext / XETRA / Paris / Amsterdam)
+      if (m.includes('EURONEXT') || m.includes('PARIS') || m.includes('AMSTERDAM') || m.includes('XETRA') || m.includes('EUROPE') || c === 'EUR') {
+        const st = checkSessionOpen('Europe/Paris', [{ start: 9 * 60, end: 17 * 60 + 30, state: 'OPEN' }]);
+        return st === 'OPEN'
+          ? { state: 'OPEN', shortBadge: '🟢 แม่วิ่งสด', color: 'text-emerald-400', thaiHours: '14:00/15:00–22:30/23:30' }
+          : { state: 'CLOSED', shortBadge: '🌙 ตลาดแม่ปิด', color: 'text-indigo-300', thaiHours: 'เปิด 14:00/15:00 น.' };
+      }
+
+      // 6. อังกฤษ (LSE)
+      if (m.includes('LSE') || m.includes('LONDON') || c === 'GBP') {
+        const st = checkSessionOpen('Europe/London', [{ start: 8 * 60, end: 16 * 60 + 30, state: 'OPEN' }]);
+        return st === 'OPEN'
+          ? { state: 'OPEN', shortBadge: '🟢 แม่วิ่งสด', color: 'text-emerald-400', thaiHours: '14:00/15:00–22:30/23:30' }
+          : { state: 'CLOSED', shortBadge: '🌙 ตลาดแม่ปิด', color: 'text-indigo-300', thaiHours: 'เปิด 14:00/15:00 น.' };
+      }
+
+      // 7. สิงคโปร์ (SGX)
+      if (m.includes('SGX') || m.includes('SINGAPORE') || c === 'SGD') {
+        const st = checkSessionOpen('Asia/Singapore', [{ start: 9 * 60, end: 17 * 60, state: 'OPEN' }]);
+        return st === 'OPEN'
+          ? { state: 'OPEN', shortBadge: '🟢 แม่วิ่งสด', color: 'text-emerald-400', thaiHours: '08:00–16:00 น.' }
+          : { state: 'CLOSED', shortBadge: '🌙 ตลาดแม่ปิด', color: 'text-slate-400', thaiHours: '08:00–16:00 น.' };
+      }
+
+      // 8. เวียดนาม (HOSE)
+      if (m.includes('HOSE') || m.includes('VIETNAM') || c === 'VND') {
+        const st = checkSessionOpen('Asia/Ho_Chi_Minh', [
+          { start: 9 * 60, end: 11 * 60 + 30, state: 'OPEN' },
+          { start: 11 * 60 + 31, end: 12 * 60 + 59, state: 'LUNCH' },
+          { start: 13 * 60, end: 14 * 60 + 45, state: 'OPEN' }
+        ]);
+        if (st === 'OPEN') return { state: 'OPEN', shortBadge: '🟢 แม่วิ่งสด', color: 'text-emerald-400', thaiHours: '09:00–14:45 น.' };
+        if (st === 'LUNCH') return { state: 'LUNCH', shortBadge: '⏸️ พักเที่ยง', color: 'text-amber-300', thaiHours: 'เปิดบ่าย 13:00 น.' };
+        return { state: 'CLOSED', shortBadge: '🌙 ตลาดแม่ปิด', color: 'text-slate-400', thaiHours: '09:00–14:45 น.' };
+      }
+
+      // 9. ไต้หวัน (TWSE)
+      if (m.includes('TWSE') || m.includes('TAIWAN') || c === 'TWD') {
+        const st = checkSessionOpen('Asia/Taipei', [{ start: 9 * 60, end: 13 * 60 + 30, state: 'OPEN' }]);
+        return st === 'OPEN'
+          ? { state: 'OPEN', shortBadge: '🟢 แม่วิ่งสด', color: 'text-emerald-400', thaiHours: '08:00–12:30 น.' }
+          : { state: 'CLOSED', shortBadge: '🌙 ตลาดแม่ปิด', color: 'text-slate-400', thaiHours: '08:00–12:30 น.' };
+      }
+
+      return { state: 'UNKNOWN', shortBadge: '', color: 'text-slate-400', thaiHours: '' };
+    }
+
+    function updateMarketClockBar() {
+      const setSt = getSetDrSessionStatus();
+      const hkSt = getParentMarketStatus('HKEX', 'HKD');
+      const cnSt = getParentMarketStatus('SSE', 'CNY');
+      const euSt = getParentMarketStatus('Euronext', 'EUR');
+      const usSt = getParentMarketStatus('NASDAQ', 'USD');
+
+      const bar = document.getElementById('marketClockBar');
+      bar.innerHTML = `
+        <span class="font-semibold ${setSt.isOpen ? 'text-emerald-400' : 'text-slate-400'}">${setSt.label}</span>
+        <span class="text-slate-700">|</span>
+        <span>🇭🇰 ฮ่องกง: <strong class="${hkSt.color}">${hkSt.shortBadge}</strong></span>
+        <span>🇨🇳 จีน: <strong class="${cnSt.color}">${cnSt.shortBadge}</strong></span>
+        <span>🇪🇺 ยุโรป: <strong class="${euSt.color}">${euSt.shortBadge}</strong></span>
+        <span>🇺🇸 สหรัฐฯ: <strong class="${usSt.color}">${usSt.shortBadge}</strong></span>
+      `;
+    }
+
+    // ==========================================
+    // Watchlist & UI Controls
+    // ==========================================
     function saveWatchlist() {
       localStorage.setItem(WATCHLIST_KEY, JSON.stringify(Array.from(watchlist)));
       updateWatchlistCounters();
@@ -465,7 +671,6 @@
       return num.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
     }
 
-    // แสดงการ์ดกลุ่มตัวติดดาวด้านบนสุด
     function renderWatchlistDeck() {
       const grid = document.getElementById('watchlistCardsGrid');
       const emptyPrompt = document.getElementById('watchlistEmptyPrompt');
@@ -479,8 +684,7 @@
         emptyPrompt.classList.remove('hidden');
         syncBtn.classList.add('hidden');
 
-        // แสดงปุ่มกดติดดาวด่วนจากตัวที่มีในชีต
-        const suggestions = ['GOOG80', 'AAPL80', 'NVDA80', 'KO80', 'PEP80', 'BYDCOM80', 'XIAOMI80', 'MA80']
+        const suggestions = ['GOOG80', 'AAPL80', 'NVDA80', 'KO80', 'PEP80', 'PNG80', 'MA80', 'SPHLTH80']
           .filter(sym => allItems.some(it => it.drSymbol === sym));
         const chipsBox = document.getElementById('quickStarChips');
         chipsBox.innerHTML = suggestions.map(sym => `
@@ -497,6 +701,7 @@
 
       grid.innerHTML = starredItems.map(item => {
         const status = getZoneStatus(item);
+        const mktStatus = getParentMarketStatus(item.market, item.currency);
         const setP = Number(item.setPrice) || 0;
         const fairP = Number(item.fairPrice) || 0;
         const buyT = Number(item.buyTarget) || 0;
@@ -527,14 +732,17 @@
         return `
           <div onclick="openModalBySymbol('${item.drSymbol}')" class="cursor-pointer rounded-xl border ${borderClass} p-3.5 transition hover:border-amber-400/50 hover:bg-slate-900">
             <div class="flex items-start justify-between gap-2">
-              <div class="flex items-center gap-2">
-                <button onclick="toggleStar(event, '${item.drSymbol}')" class="text-base leading-none text-amber-400 transition hover:scale-125" title="นำออกจากรายการติดดาว">★</button>
+              <div class="flex items-start gap-2">
+                <button onclick="toggleStar(event, '${item.drSymbol}')" class="mt-0.5 text-base leading-none text-amber-400 transition hover:scale-125" title="นำออกจากรายการติดดาว">★</button>
                 <div>
-                  <div class="flex items-center gap-1.5">
+                  <div class="flex flex-wrap items-center gap-1.5">
                     <span class="text-sm font-bold text-white">${item.drSymbol}</span>
                     <span class="rounded bg-slate-800 px-1.5 py-0.5 text-[10px] text-slate-400">${item.parentTicker}</span>
+                    <span class="text-[10px] font-medium ${mktStatus.color}">${mktStatus.shortBadge}</span>
                   </div>
-                  <p class="text-[10px] text-slate-400">${item.market} • Ratio ${item.ratioText}</p>
+                  <div class="mt-1 flex flex-wrap items-center gap-1">
+                    ${renderSectorBadges(item.sectors)}
+                  </div>
                 </div>
               </div>
               ${statusTag}
@@ -567,6 +775,23 @@
     function populateDropdowns(items) {
       const issuers = [...new Set(items.map(i => i.issuer))].sort();
       const markets = [...new Set(items.map(i => i.market))].sort();
+
+      // รวบรวมหมวดหมู่ทั้งหมดที่มีในชีต + 15 หมวดมาตรฐานโบรกเกอร์
+      const standardSectors = [
+        'เทคโนโลยี', 'วัสดุพื้นฐาน', 'การสื่อสาร', 'สินค้าฟุ่มเฟือย', 'สินค้าจำเป็น',
+        'สุขภาพ', 'อุตสาหกรรม', 'อสังหาริมทรัพย์', 'สาธารณูปโภค', 'ธุรกิจการเงิน',
+        'เกษตรและอุตสาหกรรมอาหาร', 'สินค้าอุปโภคบริโภค', 'ก่อสร้าง', 'ทรัพยากร', 'บริการ', 'ดัชนี / ETF'
+      ];
+      const existingSectors = new Set(standardSectors);
+      items.forEach(it => {
+        if (Array.isArray(it.sectors)) it.sectors.forEach(s => existingSectors.add(s));
+      });
+
+      const sectorSel = document.getElementById('sectorFilter');
+      const currentSector = sectorSel.value;
+      sectorSel.innerHTML = '<option value="ALL">ทุกหมวดหมู่ (15 กลุ่ม)</option>' +
+        Array.from(existingSectors).map(sec => `<option value="${sec}">${sec}</option>`).join('');
+      if (existingSectors.has(currentSector)) sectorSel.value = currentSector;
 
       const issuerSel = document.getElementById('issuerFilter');
       const currentIssuer = issuerSel.value;
@@ -607,6 +832,7 @@
 
     function applyFilters() {
       const q = document.getElementById('searchInput').value.trim().toLowerCase();
+      const sectorVal = document.getElementById('sectorFilter').value;
       const issuerVal = document.getElementById('issuerFilter').value;
       const marketVal = document.getElementById('marketFilter').value;
 
@@ -615,11 +841,16 @@
         if (issuerVal !== 'ALL' && item.issuer !== issuerVal) return false;
         if (marketVal !== 'ALL' && item.market !== marketVal) return false;
 
+        if (sectorVal !== 'ALL') {
+          const itemSectors = Array.isArray(item.sectors) ? item.sectors : [];
+          if (!itemSectors.includes(sectorVal)) return false;
+        }
+
         const status = getZoneStatus(item);
         if (zoneFilter !== 'ALL' && status !== zoneFilter) return false;
 
         if (q) {
-          const hay = `${item.drSymbol} ${item.parentTicker} ${item.market} ${item.currency}`.toLowerCase();
+          const hay = `${item.drSymbol} ${item.parentTicker} ${item.market} ${item.currency} ${item.sectorText || ''}`.toLowerCase();
           if (!hay.includes(q)) return false;
         }
         return true;
@@ -653,6 +884,7 @@
       tbody.innerHTML = items.map(item => {
         const isStarred = watchlist.has(item.drSymbol);
         const status = getZoneStatus(item);
+        const mktStatus = getParentMarketStatus(item.market, item.currency);
         const parentP = Number(item.parentPrice) || 0;
         const chg = Number(item.parentChangePct) || 0;
         const fx = Number(item.fxRate) || 0;
@@ -690,11 +922,15 @@
               </button>
             </td>
             <td class="px-3 py-3">
-              <div class="flex items-center gap-1.5">
+              <div class="flex flex-wrap items-center gap-1.5">
                 <span class="font-bold text-white">${item.drSymbol}</span>
                 <span class="rounded bg-slate-800 px-1.5 py-0.5 text-[10px] text-slate-400">${item.market}</span>
+                <span class="text-[10px] font-medium ${mktStatus.color}">${mktStatus.shortBadge}</span>
               </div>
-              <div class="mt-0.5 text-[11px] text-slate-400">${item.parentTicker}</div>
+              <div class="mt-1 flex flex-wrap items-center gap-1">
+                <span class="text-[11px] text-slate-400 mr-1">${item.parentTicker}</span>
+                ${renderSectorBadges(item.sectors)}
+              </div>
             </td>
             <td class="px-3 py-3 text-right text-slate-300 tabular-nums">${item.ratioText}</td>
             <td class="px-3 py-3 text-right tabular-nums">
@@ -724,6 +960,7 @@
       if (!item) return;
       selectedModalItem = item;
 
+      const mktStatus = getParentMarketStatus(item.market, item.currency);
       const tick = Number(item.tickSize) || 0.01;
       const fx = Number(item.fxRate) || 0;
       const buyT = Number(item.buyTarget) || 0;
@@ -731,8 +968,9 @@
       const setP = Number(item.setPrice) || 0;
 
       document.getElementById('modalTitle').textContent = item.drSymbol;
-      document.getElementById('modalMarket').textContent = `${item.market} • ${item.parentTicker}`;
-      document.getElementById('modalSubtitle').textContent = `Ratio ${item.ratioText} • Tick Size ${tick.toFixed(2)} ฿ • FX ${fx.toFixed(2)}`;
+      document.getElementById('modalMarket').textContent = `${item.market} • ${item.parentTicker} (${mktStatus.shortBadge})`;
+      document.getElementById('modalSubtitle').textContent = `Ratio ${item.ratioText} • Tick ${tick.toFixed(2)} ฿ • เวลาตลาดแม่ ${mktStatus.thaiHours}`;
+      document.getElementById('modalSectors').innerHTML = renderSectorBadges(item.sectors);
       document.getElementById('modalBuyTarget').textContent = buyT > 0 ? '≤ ' + formatPrice(buyT, tick) + ' ฿' : '-';
       document.getElementById('modalFairPrice').textContent = fairP > 0 ? formatPrice(fairP, tick) + ' ฿' : '-';
       document.getElementById('modalSetPrice').textContent = setP > 0 ? formatPrice(setP, tick) + ' ฿' : 'รอเปิดตลาด';
@@ -801,7 +1039,6 @@
       }, 4500);
     }
 
-    // โหลดข้อมูลจาก Apps Script API (รองรับทั้งดึง Cache ทั้งกระดาน และดึงสดเฉพาะตัวติดดาว)
     function loadData(forceRefresh = false) {
       const btn = document.getElementById('refreshBtn');
       const icon = document.getElementById('refreshIcon');
@@ -875,6 +1112,8 @@
     window.addEventListener('DOMContentLoaded', () => {
       initQuickGuideState();
       updateWatchlistCounters();
+      updateMarketClockBar();
+      setInterval(updateMarketClockBar, 60000); // อัปเดตสถานะเปิด-ปิดตลาดทุก 1 นาที
       loadData(false);
     });
   </script>
