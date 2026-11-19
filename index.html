@@ -176,6 +176,7 @@
         <div class="border-x border-slate-800"><p class="text-[11px] text-slate-400">Fair Value</p><p id="mFair" class="font-bold num"></p></div>
         <div><p class="text-[11px] text-slate-400">ราคา SET</p><p id="mSet" class="font-bold num"></p></div>
       </div>
+      <div id="mHist" class="rounded-xl border border-slate-800 p-3"></div>
       <div class="space-y-3 rounded-xl border border-slate-800 p-3">
         <b>🧮 ซื้อได้กี่หน่วย?</b>
         <div class="grid grid-cols-2 gap-3">
@@ -305,7 +306,7 @@ function loadData(live){
   const btn=$('liveBtn'); btn.disabled=true; btn.textContent='⏳ กำลังดึง...';
   const stars=[...wl]; const url=live?`${GAS_API_URL}?refresh=1${stars.length?'&stars='+encodeURIComponent(stars.join(',')):''}`:GAS_API_URL;
   fetch(url,{credentials:'omit'}).then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.json()})
-  .then(res=>{applyPayload(res,false);if(live)toast(res.syncMode==='STARRED_LIVE'?`⚡ อัปเดตราคาสด ${res.syncedStarCount} ตัวแล้ว`:'ยังไม่มีตัวติดดาว ใช้ข้อมูลล่าสุดแทน')})
+  .then(res=>{if(res.error)throw new Error('เซิร์ฟเวอร์ขัดข้องชั่วคราว');applyPayload(res,false);if(live)toast(res.quotaLimited?'โควตาดึงราคาสดของวันนี้ใกล้เต็ม แสดงราคาล่าสุดที่มีแทน':res.syncMode==='STARRED_LIVE'?`⚡ อัปเดตราคาสด ${res.syncedStarCount} ตัวแล้ว`:'ยังไม่มีตัวติดดาว ใช้ข้อมูลล่าสุดแทน')})
   .catch(err=>{$('loading').classList.add('hidden');if(!items.length){$('error').classList.remove('hidden');$('errMsg').textContent=err.message}else toast('เชื่อมต่อไม่สำเร็จ แสดงข้อมูลล่าสุดที่มี')})
   .finally(()=>{btn.disabled=false;btn.textContent='⚡ อัปเดตราคาสด'});
 }
@@ -316,7 +317,7 @@ function openModal(s){
   $('mTitle').textContent=s; $('mSub').textContent=`${cur.parentTicker} • ${cur.market} • Ratio ${cur.ratioText} • Tick ${t.toFixed(2)} ฿`;
   $('mBuy').textContent=cur.buyTarget>0?'≤ '+fmt(cur.buyTarget,t):'-'; $('mFair').textContent=fmt(cur.fairPrice,t); $('mSet').textContent=st>0?fmt(st,t):'รอราคา';
   $('mBid').value=st||cur.buyTarget||cur.fairPrice||''; $('mBid').step=t; $('mHH').checked=happyNow();
-  $('mTarget').value=m.targetPrice||''; $('mNote').value=m.note||''; pickBucket(m.bucket||''); calc();
+  loadHist(s,st>0&&cur.diffPct!=null?Number(cur.diffPct):null); $('mTarget').value=m.targetPrice||''; $('mNote').value=m.note||''; pickBucket(m.bucket||''); calc();
   $('modal').classList.remove('hidden'); $('modal').classList.add('flex'); document.body.style.overflow='hidden';
 }
 function closeModal(){$('modal').classList.add('hidden');$('modal').classList.remove('flex');document.body.style.overflow=''}
@@ -531,6 +532,23 @@ function loadNews(){
   try{const c=JSON.parse(localStorage.getItem('nexdr_news_v1')||'null');if(c&&Date.now()-c.t<1800000){newsData=c.d;renderNews();return}}catch(e){}
   fetch(GAS_API_URL+'?news=1',{credentials:'omit'}).then(r=>r.json()).then(d=>{newsData=d;try{localStorage.setItem('nexdr_news_v1',JSON.stringify({t:Date.now(),d}))}catch(e){}renderNews()})
   .catch(()=>{$('newsList').innerHTML='<p class="py-6 text-sm text-slate-400">โหลดข่าวไม่สำเร็จ ลองรีเฟรชหน้านี้อีกครั้ง</p>'});
+}
+
+// ---------- ประวัติส่วนต่างราคา (กราฟใน Modal) ----------
+let histFor='';
+function histHtml(P,cur){
+  const head='<b class="text-sm">📈 ประวัติส่วนต่างราคา (DR เทียบหุ้นแม่)</b>';
+  if(P.length<6)return head+`<p class="mt-1 text-xs text-slate-400">ข้อมูลยังสะสมไม่พอ (มี ${P.length} จุด) ระบบบันทึกให้วันละ 2 ครั้ง ต้องใช้เวลาสักพักก่อนกราฟจะมีความหมาย</p>`;
+  const v=P.map(p=>p[1]),avg=v.reduce((s,x)=>s+x,0)/v.length,mn=Math.min(0,...v,cur==null?0:cur),mx=Math.max(0,...v,cur==null?0:cur),rg=(mx-mn)||1;
+  const W=320,H=130,L=34,B=16,T=8,R=6,X=i=>L+i/(P.length-1)*(W-L-R),Y=y=>T+(1-(y-mn)/rg)*(H-T-B),tx=(y,t)=>`<text x="${L-4}" y="${Y(y)+3}" font-size="8" fill="#94a3b8" text-anchor="end">${t}</text>`;
+  const svg=`<svg viewBox="0 0 ${W} ${H}" class="mt-2 w-full"><line x1="${L}" x2="${W-R}" y1="${Y(0)}" y2="${Y(0)}" stroke="#64748b" stroke-dasharray="3 3" stroke-width=".7"/>${tx(0,'0%')}${mx>0?tx(mx,mx.toFixed(1)):''}${mn<0?tx(mn,mn.toFixed(1)):''}<polyline fill="none" stroke="#34d399" stroke-width="2" points="${v.map((y,i)=>X(i).toFixed(1)+','+Y(y).toFixed(1)).join(' ')}"/>${cur==null?'':`<circle cx="${W-R}" cy="${Y(cur)}" r="3" fill="#f59e0b"/>`}<text x="${L}" y="${H-3}" font-size="8" fill="#94a3b8">${esc(P[0][0].slice(5,10))}</text><text x="${W-R}" y="${H-3}" font-size="8" fill="#94a3b8" text-anchor="end">${esc(P[P.length-1][0].slice(5,10))}</text></svg>`;
+  const cheaper=cur==null?null:Math.round(v.filter(x=>x>cur).length/v.length*100);
+  return head+svg+`<p class="mt-1 text-xs text-slate-300">เฉลี่ย <b class="num">${avg.toFixed(2)}%</b> • ต่ำสุด <b class="num">${Math.min(...v).toFixed(2)}%</b> • สูงสุด <b class="num">${Math.max(...v).toFixed(2)}%</b> (${P.length} จุด)</p>`+(cur==null?'':`<p class="mt-1 text-xs text-slate-300">ตอนนี้ <b class="num ${cur<0?'text-emerald-400':'text-rose-400'}">${cur.toFixed(2)}%</b> — ถูกกว่าหุ้นแม่มากกว่า <b>${cheaper}%</b> ของครั้งที่บันทึกไว้</p>`)+'<p class="mt-1 text-[11px] text-slate-500">ส่วนต่างในอดีตไม่ได้รับประกันอนาคต ใช้ประกอบการตัดสินใจเท่านั้น</p>';
+}
+function loadHist(s,cur){
+  histFor=s;const el=$('mHist');el.innerHTML='<b class="text-sm">📈 ประวัติส่วนต่างราคา</b><p class="mt-1 text-xs text-slate-400">กำลังโหลด...</p>';
+  fetch(GAS_API_URL+'?history='+encodeURIComponent(s),{credentials:'omit'}).then(r=>r.json()).then(d=>{if(histFor===s)el.innerHTML=histHtml(d.points||[],cur)})
+  .catch(()=>{if(histFor===s)el.innerHTML='<b class="text-sm">📈 ประวัติส่วนต่างราคา</b><p class="mt-1 text-xs text-slate-400">โหลดประวัติไม่สำเร็จในตอนนี้</p>'});
 }
 
 window.addEventListener('DOMContentLoaded',()=>{
