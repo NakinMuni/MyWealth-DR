@@ -100,6 +100,7 @@
         <select id="sort" onchange="renderBoard()" class="rounded-lg border border-slate-700 bg-slate-950 px-2 py-1 text-xs"><option value="name">เรียง: ชื่อ A-Z</option><option value="diff">เรียง: ถูกกว่าแม่มากสุด</option></select></div>
     </div>
 
+    <p id="boardNote" class="text-[11px] leading-relaxed text-slate-500"></p>
     <div id="board" class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3"></div>
     <button id="more" onclick="page++;renderBoard()" class="mx-auto hidden rounded-xl border border-slate-700 bg-slate-900 px-6 py-2.5 text-sm">แสดงเพิ่ม</button>
     <p id="empty" class="hidden py-12 text-center text-sm text-slate-400">ไม่พบรายการที่ตรงกับเงื่อนไข</p>
@@ -241,7 +242,7 @@ function card(i){
     <div class="mt-2.5 flex flex-wrap items-center justify-between gap-1 text-xs text-slate-400">
       <span>แม่ ${pp>0?pp.toFixed(2):'-'} ${esc(i.currency)} ${pp>0?`<span class="${chg>=0?'text-emerald-400':'text-rose-400'}">(${chg>=0?'+':''}${chg.toFixed(2)}%)</span>`:''}</span>
       <span>ส่วนต่าง ${d==null?'-':`<b class="num ${d<0?'text-emerald-400':d>0?'text-rose-400':''}">${d>0?'+':''}${d.toFixed(2)}%</b>`}</span></div>
-    ${(m.bucket||m.targetPrice||m.note)?`<div class="mt-2 flex flex-wrap gap-1.5 text-[11px]">${m.bucket?`<span class="rounded bg-slate-800 px-1.5 py-0.5">${BUCKETS[m.bucket][0]} ${BUCKETS[m.bucket][1]}</span>`:''}${m.targetPrice?`<span class="rounded bg-amber-500/15 px-1.5 py-0.5 text-amber-300">🎯 ≤ ${fmt(m.targetPrice,i.tickSize)}</span>`:''}${m.note?`<span class="truncate rounded bg-slate-800 px-1.5 py-0.5 text-slate-300">📝 ${esc(m.note)}</span>`:''}</div>`:''}
+    ${tline(i)}${(m.bucket||m.targetPrice||m.note)?`<div class="mt-2 flex flex-wrap gap-1.5 text-[11px]">${m.bucket?`<span class="rounded bg-slate-800 px-1.5 py-0.5">${BUCKETS[m.bucket][0]} ${BUCKETS[m.bucket][1]}</span>`:''}${m.targetPrice?`<span class="rounded bg-amber-500/15 px-1.5 py-0.5 text-amber-300">🎯 ≤ ${fmt(m.targetPrice,i.tickSize)}</span>`:''}${m.note?`<span class="truncate rounded bg-slate-800 px-1.5 py-0.5 text-slate-300">📝 ${esc(m.note)}</span>`:''}</div>`:''}
   </div>`;
 }
 
@@ -297,7 +298,9 @@ function liveRefresh(){
 function applyPayload(res,fromLocal){
   items=res.items||[]; $('loading').classList.add('hidden'); $('error').classList.add('hidden');
   const live=res.syncMode==='STARRED_LIVE';
-  $('status').innerHTML=`<span class="inline-block h-2 w-2 rounded-full ${live?'bg-emerald-400':'bg-amber-400'}"></span> ${live?'อัปเดตสด':'ข้อมูลล่าสุด'} ${esc(res.updatedAt||'')}`;
+  fullMs=res.fullSyncMs||0; const fresh=fullMs&&Date.now()-fullMs<43200000;
+  $('status').innerHTML=`<span class="inline-block h-2 w-2 rounded-full ${fresh?'bg-emerald-400':'bg-amber-400'}"></span> ${fullMs?'ราคากระดาน: '+fmtT(fullMs):'ข้อมูลล่าสุด '+esc(res.updatedAt||'')}`;
+  $('boardNote').textContent=fullMs?`🕒 ราคาในกระดานดึงเมื่อ ${fmtT(fullMs)} (อัปเดตอัตโนมัติวันละ 2 รอบ) • การ์ดที่มี ⚡ คืออัปเดตสดใหม่กว่านั้น • ดูเวลาที่ท้ายแต่ละการ์ด`:'🕒 เวลาของแต่ละรายการจะแสดงหลังรอบอัปเดตอัตโนมัติถัดไป';
   $('aTime').textContent=live?`⚡ อัปเดตสดล่าสุดเวลา ${res.updatedAt} น.`:`📦 แสดงราคาจากรอบอัปเดตอัตโนมัติ (${res.updatedAt||'-'} น.) — กดปุ่มเพื่อดึงราคาสด`;
   fillFilters(); refreshAll(); route();
   if(!fromLocal)try{localStorage.setItem(CACHE_KEY,JSON.stringify(res))}catch(e){}
@@ -550,6 +553,15 @@ function loadHist(s,cur){
   fetch(GAS_API_URL+'?history='+encodeURIComponent(s),{credentials:'omit'}).then(r=>r.json()).then(d=>{if(histFor===s)el.innerHTML=histHtml(d.points||[],cur)})
   .catch(()=>{if(histFor===s)el.innerHTML='<b class="text-sm">📈 ประวัติส่วนต่างราคา</b><p class="mt-1 text-xs text-slate-400">โหลดประวัติไม่สำเร็จในตอนนี้</p>'});
 }
+
+// ---------- เวลาของราคา ----------
+let fullMs=0;
+function fmtT(ms){
+  if(!ms)return '';const o={timeZone:'Asia/Bangkok'},d=new Date(ms),day=x=>new Intl.DateTimeFormat('en-CA',o).format(x);
+  const t=new Intl.DateTimeFormat('th-TH',{...o,hour:'2-digit',minute:'2-digit',hour12:false}).format(d),dd=day(d);
+  return (dd===day(new Date())?'วันนี้':dd===day(new Date(Date.now()-864e5))?'เมื่อวาน':new Intl.DateTimeFormat('th-TH',{...o,day:'numeric',month:'short'}).format(d))+' '+t+' น.';
+}
+function tline(i){const ms=i.fetchedMs||fullMs;return ms?`<p class="mt-2 text-[10px] text-slate-500">🕒 ราคาดึงเมื่อ ${fmtT(ms)}${i.fetchedMs&&fullMs&&i.fetchedMs-fullMs>600000?' ⚡':''}</p>`:''}
 
 window.addEventListener('DOMContentLoaded',()=>{
   route(); loadNews(); if(!localStorage.getItem(WEL_KEY))$('welcome').classList.remove('hidden');
