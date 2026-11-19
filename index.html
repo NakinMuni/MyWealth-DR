@@ -27,7 +27,8 @@
       <span><b class="block text-base leading-tight">NexDR</b><span class="block text-[11px] leading-tight text-slate-400">เช็คราคา DR แบบเข้าใจง่าย</span></span>
     </a>
     <nav class="hidden gap-1 md:flex">
-      <a data-nav="home" href="#home" class="rounded-lg px-4 py-2 text-sm font-medium text-slate-300 hover:bg-slate-800">🏠 กระดานหลัก</a>
+      <a data-nav="home" href="#home" class="rounded-lg px-4 py-2 text-sm font-medium text-slate-300 hover:bg-slate-800">🏠 หน้าแรก</a>
+      <a data-nav="board" href="#board" class="rounded-lg px-4 py-2 text-sm font-medium text-slate-300 hover:bg-slate-800">📊 กระดาน</a>
       <a data-nav="analyze" href="#analyze" class="rounded-lg px-4 py-2 text-sm font-medium text-slate-300 hover:bg-slate-800">⭐ เริ่มวิเคราะห์</a>
       <a data-nav="tools" href="#tools" class="rounded-lg px-4 py-2 text-sm font-medium text-slate-300 hover:bg-slate-800">🧰 เครื่องมือ</a>
       <a data-nav="guide" href="#guide" class="rounded-lg px-4 py-2 text-sm font-medium text-slate-300 hover:bg-slate-800">📖 คู่มือ</a>
@@ -36,11 +37,12 @@
   </div>
 </header>
 
-<nav class="fixed inset-x-0 bottom-0 z-30 grid grid-cols-4 border-t border-slate-800 bg-slate-950/95 backdrop-blur md:hidden" style="padding-bottom:env(safe-area-inset-bottom)">
-  <a data-nav="home" href="#home" class="py-2.5 text-center text-[11px] text-slate-400"><span class="block text-xl">🏠</span>กระดานหลัก</a>
-  <a data-nav="analyze" href="#analyze" class="py-2.5 text-center text-[11px] text-slate-400"><span class="block text-xl">⭐</span>เริ่มวิเคราะห์</a>
-  <a data-nav="tools" href="#tools" class="py-2.5 text-center text-[11px] text-slate-400"><span class="block text-xl">🧰</span>เครื่องมือ</a>
-  <a data-nav="guide" href="#guide" class="py-2.5 text-center text-[11px] text-slate-400"><span class="block text-xl">📖</span>คู่มือ</a>
+<nav class="fixed inset-x-0 bottom-0 z-30 grid grid-cols-5 border-t border-slate-800 bg-slate-950/95 backdrop-blur md:hidden" style="padding-bottom:env(safe-area-inset-bottom)">
+  <a data-nav="home" href="#home" class="py-2.5 text-center text-[10px] text-slate-400"><span class="block text-xl">🏠</span>หน้าแรก</a>
+  <a data-nav="board" href="#board" class="py-2.5 text-center text-[10px] text-slate-400"><span class="block text-xl">📊</span>กระดาน</a>
+  <a data-nav="analyze" href="#analyze" class="py-2.5 text-center text-[10px] text-slate-400"><span class="block text-xl">⭐</span>วิเคราะห์</a>
+  <a data-nav="tools" href="#tools" class="py-2.5 text-center text-[10px] text-slate-400"><span class="block text-xl">🧰</span>เครื่องมือ</a>
+  <a data-nav="guide" href="#guide" class="py-2.5 text-center text-[10px] text-slate-400"><span class="block text-xl">📖</span>คู่มือ</a>
 </nav>
 
 <main class="mx-auto max-w-6xl px-4 py-5">
@@ -49,13 +51,28 @@
   <div id="error" class="hidden rounded-2xl border border-rose-500/30 bg-rose-950/20 p-6 text-center"><p class="font-semibold text-rose-400">เชื่อมต่อข้อมูลไม่ได้ในตอนนี้</p><p id="errMsg" class="mt-1 text-xs text-slate-400"></p><button onclick="loadData(false)" class="mt-3 rounded-lg bg-rose-500/20 px-4 py-2 text-sm text-rose-300">ลองใหม่</button></div>
 
   <!-- ===== หน้า 1: กระดานหลัก ===== -->
-  <section id="p-home" class="page space-y-4">
+  <section id="p-home" class="page space-y-5">
     <div id="welcome" class="hidden rounded-2xl border border-emerald-500/30 bg-emerald-950/20 p-4 text-sm">
       <div class="flex justify-between gap-2"><b class="text-emerald-300">👋 มือใหม่? เริ่มตรงนี้ 3 ขั้นตอน</b><button onclick="closeWelcome()" class="text-slate-400">✕</button></div>
       <ol class="mt-2 list-decimal space-y-1 pl-5 text-slate-300"><li>เลื่อนดูหุ้นด้านล่าง ตัวที่ติดป้าย <b class="text-emerald-400">🟢 น่าสะสม</b> คือราคาบนกระดานไทยถูกกว่าราคาที่ควรเป็น</li><li>กดดาว ☆ ที่หุ้นที่สนใจ (เลือกแค่ไม่กี่ตัวที่อยากตามจริงๆ)</li><li>ไปหน้า <b>⭐ เริ่มวิเคราะห์</b> เพื่ออัปเดตราคาสดเฉพาะตัวที่ติดดาว</li></ol>
       <a href="#guide" class="mt-2 inline-block text-xs text-emerald-400 underline">อ่านคู่มือฉบับเข้าใจง่าย →</a>
     </div>
+    <div><h2 class="text-xl font-bold">👋 วันนี้มีอะไรน่าสนใจ</h2><p id="hMkt" class="mt-1 text-xs text-slate-400"></p></div>
+    <div id="hTiles" class="grid grid-cols-3 gap-2.5"></div>
+    <div id="hTopBox" class="hidden space-y-2">
+      <div class="flex items-center justify-between"><h3 class="font-bold">🟢 ถูกกว่าหุ้นแม่มากสุดตอนนี้</h3><a href="#board" class="text-xs text-emerald-400">ดูทั้งหมด →</a></div>
+      <div id="hTop" class="grid grid-cols-1 gap-3 sm:grid-cols-3"></div>
+    </div>
+    <div class="space-y-2">
+      <div class="flex flex-wrap items-center justify-between gap-2"><h3 class="font-bold">📰 ข่าวตลาดวันนี้</h3>
+        <div class="flex gap-1.5"><button class="chip on" data-ntab="th" onclick="setNews('th')">ตลาดหุ้นไทย</button><button class="chip" data-ntab="world" onclick="setNews('world')">ตลาดโลก</button></div></div>
+      <div id="newsList" class="grid grid-cols-1 gap-2 md:grid-cols-2"><p class="py-6 text-sm text-slate-400">กำลังโหลดข่าว...</p></div>
+      <p class="text-[11px] text-slate-500">พาดหัวข่าวรวบรวมอัตโนมัติจาก Google News กดเพื่ออ่านต่อที่เว็บต้นทาง • ไม่ใช่คำแนะนำลงทุน</p>
+    </div>
+  </section>
 
+  <!-- ===== หน้า: กระดาน ===== -->
+  <section id="p-board" class="page space-y-4">
     <div class="grid grid-cols-3 gap-2.5 text-center">
       <div class="rounded-xl border border-slate-800 bg-slate-900/70 p-3"><p class="text-[11px] text-slate-400">DR ทั้งหมด</p><p id="kTotal" class="text-xl font-bold num">-</p></div>
       <div class="rounded-xl border border-emerald-500/25 bg-emerald-950/20 p-3"><p class="text-[11px] text-emerald-400">🟢 น่าสะสม</p><p id="kDisc" class="text-xl font-bold text-emerald-400 num">-</p></div>
@@ -100,28 +117,24 @@
     <div id="aEmpty" class="hidden rounded-2xl border border-dashed border-slate-700 p-8 text-center">
       <p class="font-semibold">ยังไม่มีหุ้นติดดาว</p><p class="mt-1 text-sm text-slate-400">ไปกดดาว ☆ ที่หน้ากระดานหลัก หรือลองเริ่มจากตัวอย่างนี้</p>
       <div id="chips" class="mt-3 flex flex-wrap justify-center gap-2"></div>
-      <a href="#home" class="mt-4 inline-block text-sm text-emerald-400 underline">ไปหน้ากระดานหลัก →</a>
+      <a href="#board" class="mt-4 inline-block text-sm text-emerald-400 underline">ไปหน้ากระดาน →</a>
     </div>
   </section>
 
   <!-- ===== หน้า: เครื่องมือ ===== -->
   <section id="p-tools" class="page space-y-4">
-    <div><h2 class="text-xl font-bold">🧰 เครื่องมือการเงิน</h2><p class="text-xs text-slate-400">คำนวณในเครื่องของคุณ ไม่ส่งข้อมูลออกไปไหน • ผลลัพธ์เป็นประมาณการเพื่อช่วยตัดสินใจ ไม่ใช่คำแนะนำลงทุน</p></div>
-    <div id="tChips" class="flex gap-2 overflow-x-auto pb-1"></div>
-    <div class="grid gap-4 md:grid-cols-2">
-      <div id="tForm" class="space-y-3 rounded-2xl border border-slate-800 bg-slate-900/60 p-4"></div>
-      <div id="tOut" class="rounded-2xl border border-emerald-500/25 bg-slate-900/60 p-4 text-sm"></div>
-    </div>
+    <div id="tHead"><h2 class="text-xl font-bold">🧰 เครื่องมือการเงิน</h2><p class="text-xs text-slate-400">แตะการ์ดเพื่อเปิดใช้งาน • คำนวณในเครื่องคุณ ไม่ส่งข้อมูลออกไปไหน • เป็นประมาณการ ไม่ใช่คำแนะนำลงทุน</p></div>
+    <div id="tGrid" class="space-y-5"></div>
+    <div id="tPanel" class="hidden space-y-3"><a href="#tools" class="text-sm text-emerald-400">← เครื่องมือทั้งหมด</a>
+      <div class="grid gap-4 md:grid-cols-2"><div id="tForm" class="space-y-3 rounded-2xl border border-slate-800 bg-slate-900/60 p-4"></div><div id="tOut" class="rounded-2xl border border-emerald-500/25 bg-slate-900/60 p-4 text-sm"></div></div></div>
   </section>
 
-  <!-- ===== หน้า 3: คู่มือ ===== -->
+  
   <section id="p-guide" class="page mx-auto max-w-3xl space-y-3 text-sm leading-relaxed text-slate-300">
     <h2 class="text-xl font-bold text-white">📖 คู่มือ</h2>
-    <div class="grid grid-cols-2 gap-3">
-      <button id="gb-nex" onclick="showGuide('nex')" class="rounded-2xl border p-4 text-left"><span class="text-2xl">🧭</span><b class="mt-1 block text-white">คู่มือ NexDR</b><span class="text-xs text-slate-400">วิธีใช้เว็บนี้</span></button>
-      <button id="gb-inv" onclick="showGuide('inv')" class="rounded-2xl border p-4 text-left"><span class="text-2xl">🎓</span><b class="mt-1 block text-white">คู่มือการลงทุน</b><span class="text-xs text-slate-400">ฉบับมือใหม่ + ศัพท์</span></button>
-    </div>
-    <div id="g-nex" class="space-y-3">
+    <a id="g-back" href="#guide" class="hidden text-sm text-emerald-400">← คู่มือทั้งหมด</a>
+    <div id="g-home" class="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-6"></div>
+    <div id="g-nex" class="hidden space-y-3">
     <details open class="rounded-xl border border-slate-800 bg-slate-900/60 p-4"><summary class="font-bold text-white">1. DR คืออะไร?</summary>
       <p class="mt-2">DR (Depositary Receipt) คือใบรับฝากที่ซื้อขายในตลาดหุ้นไทย แต่ราคาอิงหุ้นต่างประเทศ เช่น AAPL80 อิงหุ้น Apple ทำให้ซื้อหุ้นโลกด้วยเงินบาทได้ ราคา DR จึงขยับตามหุ้นแม่และค่าเงิน</p></details>
     <details class="rounded-xl border border-slate-800 bg-slate-900/60 p-4"><summary class="font-bold text-white">2. อ่านการ์ดหุ้นอย่างไร?</summary>
@@ -199,10 +212,10 @@ const toast=m=>{const t=$('toast');t.textContent=m;t.classList.remove('hidden');
 
 // ---------- ระบบหน้า (hash routing) ----------
 function route(){
-  const p=(location.hash||'#home').slice(1); const name=['home','analyze','tools','guide'].includes(p)?p:'home';
+  const parts=(location.hash||'#home').slice(1).split('/'); const name=['home','board','analyze','tools','guide'].includes(parts[0])?parts[0]:'home'; if(name==='tools')tool=TOOLS[parts[1]]?parts[1]:null;
   document.querySelectorAll('.page').forEach(e=>e.classList.toggle('on',e.id==='p-'+name));
   document.querySelectorAll('[data-nav]').forEach(a=>{const on=a.dataset.nav===name;a.classList.toggle('text-emerald-400',on);a.classList.toggle('bg-slate-800',on&&a.parentElement.classList.contains('md:flex'));a.classList.toggle('text-slate-400',!on&&!a.parentElement.classList.contains('md:flex'))});
-  window.scrollTo(0,0); if(name==='guide')$('mkt').textContent=marketNow(); if(name==='tools'&&!$('tForm').innerHTML)renderTools();
+  window.scrollTo(0,0); if(name==='guide'){$('mkt').textContent=marketNow();showGuide(parts[1]||'')} if(name==='tools'&&(tool!==shownTool||!$('tGrid').innerHTML&&!tool)){shownTool=tool;renderTools()}
 }
 window.addEventListener('hashchange',route);
 
@@ -272,7 +285,7 @@ function toggleStar(e,s){
   if(e)e.stopPropagation(); wl.has(s)?wl.delete(s):wl.add(s);
   localStorage.setItem(WL_KEY,JSON.stringify([...wl])); refreshAll();
 }
-function refreshAll(){kpis();renderBoard();renderAnalyze()}
+function refreshAll(){kpis();renderBoard();renderAnalyze();renderHome()}
 function liveRefresh(){
   const left=Math.ceil(LIVE_COOLDOWN-(Date.now()-lastLive)/1000);
   if(left>0)return toast(`รอ ${left} วินาที ค่อยกดอัปเดตอีกครั้งนะ (ช่วยประหยัดโควตา)`);
@@ -360,44 +373,46 @@ function payoff(ds,extra,mode){
   return {m,int,order,ok:!ds.some(d=>d.b>.005)};
 }
 const TOOLS={
- dca:{n:'📈 DCA / ดอกเบี้ยทบต้น',d:'ลงทุนสม่ำเสมอทุกเดือน ผลตอบแทนทบต้นแล้วจะเป็นเท่าไร (ผลตอบแทนจริงไม่แน่นอน ใส่ค่าที่ระมัดระวังไว้ก่อน)',
+ dca:{g:'📈 ลงทุน',n:'📈 DCA / ดอกเบี้ยทบต้น',d:'ลงทุนสม่ำเสมอทุกเดือน ผลตอบแทนทบต้นแล้วจะเป็นเท่าไร (ผลตอบแทนจริงไม่แน่นอน ใส่ค่าที่ระมัดระวังไว้ก่อน)',
   f:[['init','เงินก้อนแรก (บาท)',0],['pmt','ลงทุนต่อเดือน (บาท)',3000],['yrs','ระยะเวลา (ปี)',10],['ret','ผลตอบแทนคาดหวังต่อปี (%)',6]],
   run:v=>{const r=v.ret/1200,n=v.yrs*12,g=Math.pow(1+r,n),fv=v.init*g+(r?v.pmt*(g-1)/r:v.pmt*n),inv=v.init+v.pmt*n;
    return row('เงินต้นที่ใส่ไปทั้งหมด',nf(inv)+' ฿')+row('มูลค่าที่คาดว่าจะได้',nf(fv)+' ฿','text-emerald-400 text-base')+row('กำไรจากการทบต้น',nf(fv-inv)+' ฿')+row('คิดเป็น',inv>0?nf((fv/inv-1)*100,1)+'% ของเงินต้น':'-')}},
- div:{n:'💵 คำนวณเงินปันผล',d:'ถือกี่หน่วย ได้ปันผลเท่าไรต่อปี และ Dividend Yield เท่าไร',
+ div:{g:'📈 ลงทุน',n:'💵 คำนวณเงินปันผล',d:'ถือกี่หน่วย ได้ปันผลเท่าไรต่อปี และ Dividend Yield เท่าไร',
   f:[['sh','จำนวนที่ถือ (หน่วย)',100],['price','ราคาซื้อเฉลี่ย (บาท/หน่วย)',20],['dps','ปันผลต่อหน่วยต่อปี (บาท)',1],['tax','ภาษีหัก ณ ที่จ่าย (%) — ปรับตามจริง',10]],
   run:v=>{const g=v.sh*v.dps,net=g*(1-v.tax/100);
    return row('Dividend Yield (ต่อราคาซื้อ)',v.price>0?nf(v.dps/v.price*100,2)+'%':'-','text-emerald-400 text-base')+row('ปันผลก่อนหัก/ปี',nf(g,2)+' ฿')+row('ปันผลสุทธิ/ปี',nf(net,2)+' ฿')+row('เฉลี่ยต่อเดือน',nf(net/12,2)+' ฿')+row('เงินลงทุนรวม',nf(v.sh*v.price)+' ฿')}},
- avg:{n:'⚖️ ต้นทุนเฉลี่ย',d:'ซื้อหลายรอบคนละราคา ต้นทุนเฉลี่ยเท่าไร กำไร/ขาดทุนตอนนี้เป็นอย่างไร พิมพ์รอบละบรรทัด รูปแบบ: จำนวน,ราคา',
+ avg:{g:'📈 ลงทุน',n:'⚖️ ต้นทุนเฉลี่ย',d:'ซื้อหลายรอบคนละราคา ต้นทุนเฉลี่ยเท่าไร กำไร/ขาดทุนตอนนี้เป็นอย่างไร พิมพ์รอบละบรรทัด รูปแบบ: จำนวน,ราคา',
   f:[['rows','รอบซื้อ (จำนวน,ราคา)','100,20\n100,18\n50,25','area'],['fee','ค่าคอมฯ+VAT โดยประมาณ (%)',0.157],['cur','ราคาปัจจุบัน (บาท)',0]],
   run:v=>{const L=lines(v.rows).map(a=>[+a[0]||0,+a[1]||0]),u=L.reduce((s,a)=>s+a[0],0),c=L.reduce((s,a)=>s+a[0]*a[1],0)*(1+v.fee/100);
    if(!u)return '<p class="text-slate-400">ใส่รอบซื้ออย่างน้อย 1 บรรทัด</p>';
    let o=row('จำนวนรวม',nf(u)+' หน่วย')+row('ต้นทุนรวม',nf(c,2)+' ฿')+row('ต้นทุนเฉลี่ย/หน่วย',nf(c/u,3)+' ฿','text-emerald-400 text-base');
    if(v.cur>0){const pl=u*v.cur-c;o+=row('มูลค่าตอนนี้',nf(u*v.cur,2)+' ฿')+row('กำไร/ขาดทุน',(pl>=0?'+':'')+nf(pl,2)+' ฿ ('+nf(pl/c*100,2)+'%)',pl>=0?'text-emerald-400':'text-rose-400')}
    return o}},
- loan:{n:'🏦 ตารางผ่อน / ปิดหนี้เร็วขึ้น',d:'สินเชื่อผ่อนเท่ากันทุกเดือน ลองใส่ยอดโปะเพิ่มเพื่อดูว่าประหยัดดอกเบี้ยได้เท่าไร',
+ loan:{g:'💳 หนี้สิน',n:'🏦 ตารางผ่อน / ปิดหนี้เร็วขึ้น',d:'สินเชื่อผ่อนเท่ากันทุกเดือน ลองใส่ยอดโปะเพิ่มเพื่อดูว่าประหยัดดอกเบี้ยได้เท่าไร',
   f:[['P','ยอดกู้ (บาท)',500000],['rate','ดอกเบี้ยต่อปี (%)',7],['n','ผ่อนกี่เดือน',60],['ex','โปะเพิ่มต่อเดือน (บาท)',0]],
   run:v=>{const r=v.rate/1200,pay=r?v.P*r/(1-Math.pow(1+r,-v.n)):v.P/v.n,base=pay*v.n-v.P;
    let b=v.P,m=0,int=0;while(b>.005&&m<1200){const i=b*r;int+=i;const p=pay+v.ex;b=p>=b+i?0:b+i-p;m++}
    let o=row('ผ่อนต่อเดือน',nf(pay,2)+' ฿','text-emerald-400 text-base')+row('ดอกเบี้ยรวม (ไม่โปะ)',nf(base)+' ฿')+row('จ่ายรวม (ไม่โปะ)',nf(pay*v.n)+' ฿');
    if(v.ex>0)o+=row('เมื่อโปะเพิ่ม: ปิดหนี้ใน',m+' เดือน (เร็วขึ้น '+(v.n-m)+' เดือน)')+row('ดอกเบี้ยที่ประหยัดได้',nf(base-int)+' ฿','text-emerald-400');
    return o}},
- debt:{n:'⛄ Snowball vs Avalanche',d:'หลายหนี้พร้อมกัน เริ่มปิดแบบไหนดีกว่า พิมพ์หนี้ละบรรทัด รูปแบบ: ชื่อ,ยอดคงเหลือ,ดอกเบี้ย%ต่อปี,ผ่อนขั้นต่ำต่อเดือน',
+ debt:{g:'💳 หนี้สิน',n:'⛄ Snowball vs Avalanche',d:'หลายหนี้พร้อมกัน เริ่มปิดแบบไหนดีกว่า พิมพ์หนี้ละบรรทัด รูปแบบ: ชื่อ,ยอดคงเหลือ,ดอกเบี้ย%ต่อปี,ผ่อนขั้นต่ำต่อเดือน',
   f:[['rows','รายการหนี้','บัตรเครดิต,50000,18,2500\nผ่อนมือถือ,12000,0,1000\nสินเชื่อส่วนบุคคล,120000,22,4000','area'],['ex','เงินที่โปะเพิ่มได้ต่อเดือน (บาท)',3000]],
   run:v=>{const ds=lines(v.rows).map(a=>({n:a[0],b:+a[1]||0,r:+a[2]||0,min:+a[3]||0})).filter(d=>d.b>0);
    if(!ds.length)return '<p class="text-slate-400">ใส่รายการหนี้อย่างน้อย 1 บรรทัด</p>';
    const S=payoff(ds,v.ex,'snow'),A=payoff(ds,v.ex,'ava');
    const blk=(t,x)=>`<div class="rounded-xl bg-slate-950/70 p-3"><b>${t}</b>${x.ok?row('ปิดหนี้หมดใน',x.m+' เดือน')+row('ดอกเบี้ยรวม',nf(x.int)+' ฿')+row('ลำดับที่ปิด',esc(x.order.join(' → '))):'<p class="mt-1 text-rose-400">ไม่หมดภายใน 50 ปี — ยอดที่จ่ายอาจไม่พอครอบคลุมดอกเบี้ย</p>'}</div>`;
    return `<div class="space-y-3">${blk('⛄ Snowball (ปิดยอดน้อยสุดก่อน)',S)}${blk('🏔️ Avalanche (ปิดดอกเบี้ยสูงสุดก่อน)',A)}</div>`+(S.ok&&A.ok?`<p class="mt-3 text-xs text-slate-400">Avalanche ประหยัดดอกเบี้ยกว่า ${nf(Math.max(0,S.int-A.int))} ฿ ส่วน Snowball ให้กำลังใจเร็วเพราะปิดก้อนเล็กได้ไว เลือกแบบที่คุณทำต่อได้จริง</p>`:'')}},
- dti:{n:'📊 สัดส่วนหนี้ต่อรายได้ (DTI)',d:'ภาระผ่อนหนี้ต่อเดือนรวมกันกินรายได้กี่ %',
+ dti:{g:'💳 หนี้สิน',n:'📊 สัดส่วนหนี้ต่อรายได้ (DTI)',d:'ภาระผ่อนหนี้ต่อเดือนรวมกันกินรายได้กี่ %',
   f:[['inc','รายได้ต่อเดือน (บาท)',30000],['debt','ผ่อนหนี้รวมต่อเดือน (บาท)',9000]],
   run:v=>{if(v.inc<=0)return '<p class="text-slate-400">ใส่รายได้ต่อเดือน</p>';const d=v.debt/v.inc*100,s=d<=30?['text-emerald-400','ค่อนข้างสบาย']:d<=40?['text-amber-300','เริ่มตึง']:['text-rose-400','สูง ควรระวัง'];
    return row('DTI',nf(d,1)+'%',s[0]+' text-base')+row('ประเมินคร่าวๆ',s[1],s[0])+row('เหลือใช้หลังผ่อน',nf(v.inc-v.debt)+' ฿')+'<p class="mt-3 text-xs text-slate-400">เกณฑ์เป็นแนวทางทั่วไป สถาบันการเงินแต่ละแห่งใช้เกณฑ์ไม่เท่ากัน</p>'}}
 };
-let tool='dca';
+let tool=null,shownTool;
 function renderTools(){
-  $('tChips').innerHTML=Object.keys(TOOLS).map(k=>`<button class="chip ${k===tool?'on':''}" onclick="tool='${k}';renderTools()">${TOOLS[k].n}</button>`).join('');
   const T=TOOLS[tool];
+  $('tHead').classList.toggle('hidden',!!T);$('tGrid').classList.toggle('hidden',!!T);$('tPanel').classList.toggle('hidden',!T);
+  if(!T){const gs={};Object.keys(TOOLS).forEach(k=>(gs[TOOLS[k].g]=gs[TOOLS[k].g]||[]).push(k));
+    $('tGrid').innerHTML=Object.keys(gs).map(g=>`<div><h3 class="mb-2 text-sm font-bold text-slate-300">${g}</h3><div class="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-6">${gs[g].map(k=>tile('#tools/'+k,TOOLS[k].n.split(' ')[0],TOOLS[k].n.slice(TOOLS[k].n.indexOf(' ')+1))).join('')}</div></div>`).join('');return}
   $('tForm').innerHTML=`<h3 class="text-base font-bold">${T.n}</h3><p class="text-xs text-slate-400">${T.d}</p>`+T.f.map(([k,l,d,t])=>t==='area'?`<label class="block text-xs text-slate-400">${l}<textarea id="tf_${k}" rows="5" oninput="runTool()" class="inp mt-1 font-mono text-sm">${d}</textarea></label>`:`<label class="block text-xs text-slate-400">${l}<input id="tf_${k}" type="number" step="any" inputmode="decimal" value="${d}" oninput="runTool()" class="inp mt-1" /></label>`).join('');
   runTool();
 }
@@ -405,8 +420,10 @@ function runTool(){const v={};TOOLS[tool].f.forEach(([k,,,t])=>{const e=$('tf_'+
 
 // ---------- คู่มือ 2 การ์ด + ศัพท์ ----------
 function showGuide(k){
+  const ok=k==='nex'||k==='inv'; k=ok?k:'';
+  $('g-home').classList.toggle('hidden',!!k);$('g-back').classList.toggle('hidden',!k);
   $('g-nex').classList.toggle('hidden',k!=='nex');$('g-inv').classList.toggle('hidden',k!=='inv');
-  ['nex','inv'].forEach(x=>{$('gb-'+x).className='rounded-2xl border p-4 text-left '+(x===k?'border-emerald-400 bg-emerald-950/30':'border-slate-800 bg-slate-900/60')});
+  $('g-home').innerHTML=tile('#guide/nex','🧭','คู่มือ NexDR')+tile('#guide/inv','🎓','คู่มือการลงทุน')+tile('','📑','การอ่านงบการเงิน',1)+tile('','💡','แนวคิดการลงทุน',1)+tile('','🛡️','บริหารความเสี่ยง',1);
   if(k==='inv')renderGloss();
 }
 const GLOSS=[
@@ -440,8 +457,31 @@ function renderGloss(){
   $('gloss').innerHTML=L.map(g=>`<div class="rounded-xl border border-slate-800 bg-slate-900/60 p-3"><b class="text-emerald-300">${g[0]}</b><p class="mt-1 text-[13px]">${g[1]}</p></div>`).join('')||'<p class="py-6 text-center text-slate-400">ไม่พบคำศัพท์นี้</p>';
 }
 
+
+// ---------- การ์ดสี่เหลี่ยม / หน้าแรก / ข่าว ----------
+const tile=(href,ic,lb,dim)=>`<a ${dim?'':`href="${href}"`} class="flex aspect-square flex-col items-center justify-center gap-1.5 rounded-2xl border p-2 text-center ${dim?'border-slate-800/60 bg-slate-900/30 opacity-50':'border-slate-700 bg-slate-900/70 transition hover:border-emerald-500/50 active:scale-95'}"><span class="text-3xl">${ic}</span><span class="text-[11px] font-medium leading-tight">${lb}</span>${dim?'<span class="text-[9px] text-slate-500">เร็วๆ นี้</span>':''}</a>`;
+function renderHome(){
+  $('hMkt').textContent=marketNow();
+  const st=items.filter(i=>wl.has(i.drSymbol)),disc=items.filter(i=>zoneOf(i)==='DISCOUNT');
+  $('hTiles').innerHTML=[['🟢',disc.length,'น่าสะสมตอนนี้','#board'],['⭐',st.length,'ติดดาว','#analyze'],['🎯',st.filter(hit).length,'ถึงเป้าส่วนตัว','#analyze']].map(t=>`<a href="${t[3]}" class="rounded-2xl border border-slate-800 bg-slate-900/70 p-3 text-center active:scale-95"><p class="text-2xl">${t[0]}</p><p class="text-xl font-bold num">${t[1]}</p><p class="text-[11px] text-slate-400">${t[2]}</p></a>`).join('');
+  const top=disc.filter(i=>i.diffPct!=null).sort((a,b)=>a.diffPct-b.diffPct).slice(0,3);
+  $('hTopBox').classList.toggle('hidden',!top.length);$('hTop').innerHTML=top.map(card).join('');
+}
+let newsData=null,newsTab='th';
+const ago=s=>{const t=Date.parse(s);if(!t)return '';const m=Math.max(1,Math.round((Date.now()-t)/60000));return m<60?m+' นาทีที่แล้ว':m<1440?Math.round(m/60)+' ชม.ที่แล้ว':Math.round(m/1440)+' วันที่แล้ว'};
+function setNews(t){newsTab=t;document.querySelectorAll('[data-ntab]').forEach(b=>b.classList.toggle('on',b.dataset.ntab===t));renderNews()}
+function renderNews(){
+  const L=(newsData&&newsData.feeds&&newsData.feeds[newsTab])||[];
+  $('newsList').innerHTML=L.length?L.map(n=>`<a href="${/^https?:\/\//.test(n.link)?esc(n.link):'#'}" target="_blank" rel="noopener noreferrer" class="block rounded-xl border border-slate-800 bg-slate-900/60 p-3 hover:border-slate-600"><p class="text-sm font-medium leading-snug">${esc(n.title)}</p><p class="mt-1 text-[11px] text-slate-500">${esc(n.source)}${n.source?' • ':''}${ago(n.pubDate)}</p></a>`).join(''):'<p class="py-6 text-sm text-slate-400">ยังไม่มีข่าวในตอนนี้</p>';
+}
+function loadNews(){
+  try{const c=JSON.parse(localStorage.getItem('nexdr_news_v1')||'null');if(c&&Date.now()-c.t<1800000){newsData=c.d;renderNews();return}}catch(e){}
+  fetch(GAS_API_URL+'?news=1',{credentials:'omit'}).then(r=>r.json()).then(d=>{newsData=d;try{localStorage.setItem('nexdr_news_v1',JSON.stringify({t:Date.now(),d}))}catch(e){}renderNews()})
+  .catch(()=>{$('newsList').innerHTML='<p class="py-6 text-sm text-slate-400">โหลดข่าวไม่สำเร็จ ลองรีเฟรชหน้านี้อีกครั้ง</p>'});
+}
+
 window.addEventListener('DOMContentLoaded',()=>{
-  showGuide('nex'); route(); if(!localStorage.getItem(WEL_KEY))$('welcome').classList.remove('hidden');
+  route(); loadNews(); if(!localStorage.getItem(WEL_KEY))$('welcome').classList.remove('hidden');
   try{const c=JSON.parse(localStorage.getItem(CACHE_KEY)||'null');if(c&&c.items&&c.items.length)applyPayload(c,true)}catch(e){} // โชว์ข้อมูลเก่าทันทีระหว่างรอของใหม่
   loadData(false);
 });
