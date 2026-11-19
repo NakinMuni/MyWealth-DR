@@ -362,50 +362,103 @@ function closeWelcome(){localStorage.setItem(WEL_KEY,'1');$('welcome').classList
 const nf=(v,d=0)=>Number(v).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
 const row=(l,v,c='')=>`<div class="flex justify-between gap-3 border-b border-slate-800/70 py-2 last:border-0"><span class="text-slate-400">${l}</span><b class="num text-right ${c}">${v}</b></div>`;
 const lines=t=>String(t).split('\n').map(l=>l.split(',').map(x=>x.trim())).filter(a=>a.length>=2&&a[0]);
-function payoff(ds,extra,mode){
-  ds=ds.map(d=>({...d})); let m=0,int=0,order=[];
-  while(ds.some(d=>d.b>.005)&&m<600){
-    m++; ds.forEach(d=>{if(d.b>0){const i=d.b*d.r/1200;d.b+=i;int+=i}});
-    let pool=extra; ds.forEach(d=>{if(d.b>.005){const p=Math.min(d.min,d.b);d.b-=p;pool+=d.min-p}else pool+=d.min});
-    ds.filter(d=>d.b>.005).sort(mode==='snow'?(a,b)=>a.b-b.b:(a,b)=>b.r-a.r).forEach(d=>{const p=Math.min(pool,d.b);d.b-=p;pool-=p});
-    ds.forEach(d=>{if(!d.done&&d.b<=.005){d.done=1;order.push(d.n)}});
-  }
-  return {m,int,order,ok:!ds.some(d=>d.b>.005)};
+const tbl=(h,r)=>`<div class="mt-2 overflow-x-auto rounded-lg border border-slate-800"><table class="w-full whitespace-nowrap text-xs num"><thead class="bg-slate-950 text-slate-400"><tr>${h.map((x,i)=>`<th class="px-2 py-1.5 ${i?'text-right':'text-left'}">${x}</th>`).join('')}</tr></thead><tbody>${r.map(c=>`<tr class="border-t border-slate-800/70">${c.map((x,i)=>`<td class="px-2 py-1.5 ${i?'text-right':'text-left'}">${x}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+const box=(t,b,c='border-slate-800')=>`<div class="mt-4 rounded-xl border ${c} bg-slate-950/50 p-3"><b class="text-sm">${t}</b><div class="mt-1.5 text-[13px] leading-relaxed text-slate-300">${b}</div></div>`;
+const fold=(t,b)=>`<details class="mt-3 rounded-xl border border-slate-800 p-3"><summary class="cursor-pointer text-sm font-semibold text-slate-200">${t}</summary>${b}</details>`;
+const abbr=v=>v>=1e6?(v/1e6).toFixed(1)+'M':v>=1e3?Math.round(v/1e3)+'k':Math.round(v);
+function chart(S,xl){
+  const W=320,H=150,L=40,B=18,T=8,R=6,N=Math.max(...S.map(s=>s.p.length)),mx=Math.max(1,...S.flatMap(s=>s.p));
+  const X=i=>L+(N<2?0:i/(N-1))*(W-L-R),Y=v=>T+(1-v/mx)*(H-T-B);
+  const g=[0,.5,1].map(f=>`<line x1="${L}" x2="${W-R}" y1="${Y(mx*f)}" y2="${Y(mx*f)}" stroke="#334155" stroke-width=".5"/><text x="${L-4}" y="${Y(mx*f)+3}" font-size="8" fill="#94a3b8" text-anchor="end">${abbr(mx*f)}</text>`).join('');
+  const ln=S.map(s=>`<polyline fill="none" stroke="${s.c}" stroke-width="2" points="${s.p.map((v,i)=>X(i).toFixed(1)+','+Y(v).toFixed(1)).join(' ')}"/>`).join('');
+  return `<svg viewBox="0 0 ${W} ${H}" class="mt-3 w-full">${g}${ln}<text x="${L}" y="${H-4}" font-size="8" fill="#94a3b8">เริ่มต้น</text><text x="${W-R}" y="${H-4}" font-size="8" fill="#94a3b8" text-anchor="end">${N-1} ${xl}</text></svg><div class="flex flex-wrap gap-3 text-[11px] text-slate-300">${S.map(s=>`<span><i class="mr-1 inline-block h-2 w-3 rounded" style="background:${s.c}"></i>${s.n}</span>`).join('')}</div>`;
 }
+function payoff(ds,extra,mode){
+  ds=ds.map(d=>({...d})); const hist=[{m:0,rem:ds.reduce((s,d)=>s+d.b,0)}],events=[]; let m=0,int=0;
+  while(ds.some(d=>d.b>.005)&&m<600){
+    m++; let mi=0; ds.forEach(d=>{if(d.b>0){const i=d.b*d.r/1200;d.b+=i;mi+=i}}); int+=mi;
+    const pay={}; ds.forEach(d=>pay[d.n]=0); let pool=extra;
+    ds.forEach(d=>{if(d.b>.005){const p=Math.min(d.min,d.b);d.b-=p;pay[d.n]+=p;pool+=d.min-p}else pool+=d.min});
+    let tgt=''; ds.filter(d=>d.b>.005).sort(mode==='snow'?(a,b)=>a.b-b.b:(a,b)=>b.r-a.r).forEach(d=>{const p=Math.min(pool,d.b);if(p>0&&!tgt)tgt=d.n;d.b-=p;pay[d.n]+=p;pool-=p});
+    ds.forEach(d=>{if(!d.done&&d.b<=.005){d.done=1;events.push({n:d.n,m,min:d.min})}});
+    hist.push({m,rem:ds.reduce((s,d)=>s+Math.max(0,d.b),0),paid:Object.values(pay).reduce((s,x)=>s+x,0),int:mi,tgt,pay});
+  }
+  return {m,int,hist,events,ok:!ds.some(d=>d.b>.005)};
+}
+let dMode='ava';
 const TOOLS={
- dca:{g:'📈 ลงทุน',n:'📈 DCA / ดอกเบี้ยทบต้น',d:'ลงทุนสม่ำเสมอทุกเดือน ผลตอบแทนทบต้นแล้วจะเป็นเท่าไร (ผลตอบแทนจริงไม่แน่นอน ใส่ค่าที่ระมัดระวังไว้ก่อน)',
+ dca:{g:'📈 ลงทุน',n:'📈 DCA / ดอกเบี้ยทบต้น',d:'ลงทุนสม่ำเสมอทุกเดือน ผลตอบแทนทบต้นแล้วจะเป็นเท่าไร',
+  h:'ใส่เงินก้อนแรก (ถ้ามี) เงินที่จะลงทุนทุกเดือน จำนวนปี และผลตอบแทนที่คาดหวังต่อปี ผลตอบแทนจริงไม่แน่นอน แนะนำให้ลองใส่ค่าต่ำๆ ก่อน แล้วดูตารางสถานการณ์ด้านล่างประกอบ',
   f:[['init','เงินก้อนแรก (บาท)',0],['pmt','ลงทุนต่อเดือน (บาท)',3000],['yrs','ระยะเวลา (ปี)',10],['ret','ผลตอบแทนคาดหวังต่อปี (%)',6]],
-  run:v=>{const r=v.ret/1200,n=v.yrs*12,g=Math.pow(1+r,n),fv=v.init*g+(r?v.pmt*(g-1)/r:v.pmt*n),inv=v.init+v.pmt*n;
-   return row('เงินต้นที่ใส่ไปทั้งหมด',nf(inv)+' ฿')+row('มูลค่าที่คาดว่าจะได้',nf(fv)+' ฿','text-emerald-400 text-base')+row('กำไรจากการทบต้น',nf(fv-inv)+' ฿')+row('คิดเป็น',inv>0?nf((fv/inv-1)*100,1)+'% ของเงินต้น':'-')}},
- div:{g:'📈 ลงทุน',n:'💵 คำนวณเงินปันผล',d:'ถือกี่หน่วย ได้ปันผลเท่าไรต่อปี และ Dividend Yield เท่าไร',
-  f:[['sh','จำนวนที่ถือ (หน่วย)',100],['price','ราคาซื้อเฉลี่ย (บาท/หน่วย)',20],['dps','ปันผลต่อหน่วยต่อปี (บาท)',1],['tax','ภาษีหัก ณ ที่จ่าย (%) — ปรับตามจริง',10]],
-  run:v=>{const g=v.sh*v.dps,net=g*(1-v.tax/100);
-   return row('Dividend Yield (ต่อราคาซื้อ)',v.price>0?nf(v.dps/v.price*100,2)+'%':'-','text-emerald-400 text-base')+row('ปันผลก่อนหัก/ปี',nf(g,2)+' ฿')+row('ปันผลสุทธิ/ปี',nf(net,2)+' ฿')+row('เฉลี่ยต่อเดือน',nf(net/12,2)+' ฿')+row('เงินลงทุนรวม',nf(v.sh*v.price)+' ฿')}},
- avg:{g:'📈 ลงทุน',n:'⚖️ ต้นทุนเฉลี่ย',d:'ซื้อหลายรอบคนละราคา ต้นทุนเฉลี่ยเท่าไร กำไร/ขาดทุนตอนนี้เป็นอย่างไร พิมพ์รอบละบรรทัด รูปแบบ: จำนวน,ราคา',
-  f:[['rows','รอบซื้อ (จำนวน,ราคา)','100,20\n100,18\n50,25','area'],['fee','ค่าคอมฯ+VAT โดยประมาณ (%)',0.157],['cur','ราคาปัจจุบัน (บาท)',0]],
-  run:v=>{const L=lines(v.rows).map(a=>[+a[0]||0,+a[1]||0]),u=L.reduce((s,a)=>s+a[0],0),c=L.reduce((s,a)=>s+a[0]*a[1],0)*(1+v.fee/100);
-   if(!u)return '<p class="text-slate-400">ใส่รอบซื้ออย่างน้อย 1 บรรทัด</p>';
-   let o=row('จำนวนรวม',nf(u)+' หน่วย')+row('ต้นทุนรวม',nf(c,2)+' ฿')+row('ต้นทุนเฉลี่ย/หน่วย',nf(c/u,3)+' ฿','text-emerald-400 text-base');
+  run:v=>{const N=Math.round(v.yrs*12);if(N<1)return '<p class="text-slate-400">ใส่ระยะเวลาอย่างน้อย 1 ปี</p>';
+   const fv=(n,p)=>{const q=p/1200,g=Math.pow(1+q,n);return v.init*g+(q?v.pmt*(g-1)/q:v.pmt*n)},inv=n=>v.init+v.pmt*n,Y=Math.ceil(N/12),A=[],V=[],R=[];
+   for(let y=0;y<=Y;y++){const n=Math.min(y*12,N);A.push(inv(n));V.push(fv(n,v.ret));if(y)R.push([y,nf(inv(n)),nf(fv(n,v.ret)),nf(fv(n,v.ret)-inv(n))])}
+   const F=fv(N,v.ret),I=inv(N);
+   let o=row('เงินต้นที่ใส่ไปทั้งหมด',nf(I)+' ฿')+row('มูลค่าที่คาดว่าจะได้',nf(F)+' ฿','text-emerald-400 text-base')+row('กำไรจากการทบต้น',nf(F-I)+' ฿')
+    +chart([{n:'เงินต้นสะสม',c:'#94a3b8',p:A},{n:'มูลค่าพอร์ต',c:'#34d399',p:V}],'ปี');
+   o+=box('🎲 ถ้าผลตอบแทนจริงไม่เป็นไปตามคาด',tbl(['ผลตอบแทน/ปี','มูลค่าที่ได้','กำไร'],[Math.max(0,v.ret-3),v.ret,v.ret+3].map(p=>[nf(p,1)+'%',nf(fv(N,p)),nf(fv(N,p)-I)])));
+   o+=fold('📅 ตารางรายปี',tbl(['ปีที่','เงินต้นสะสม','มูลค่าพอร์ต','กำไร'],R));
+   o+=box('✅ แผนที่ทำตามได้','<ol class="list-decimal space-y-1 pl-5"><li>ตั้งโอนอัตโนมัติ <b>'+nf(v.pmt)+' ฿</b> ทุกเดือน ในวันที่เงินเดือนเข้า (เพื่อไม่ต้องใช้แรงใจ)</li><li>ลงทุนต่อเนื่อง <b>'+v.yrs+' ปี</b> ไม่ต้องจับจังหวะตลาด</li><li>ปีละครั้งทบทวนว่าเพิ่มเงินลงทุนได้ไหม</li></ol>'+(N>60?'<p class="mt-2 text-amber-300">⏳ ถ้าเริ่มช้าไป 5 ปี มูลค่าปลายทางจะลดลงประมาณ <b>'+nf(F-fv(N-60,v.ret))+' ฿</b> — ยิ่งเริ่มเร็วยิ่งได้เปรียบ</p>':''),'border-emerald-500/30');
+   return o}},
+ div:{g:'📈 ลงทุน',n:'💵 คำนวณเงินปันผล',d:'ถือกี่หน่วยได้ปันผลเท่าไร และต้องถือเท่าไรถึงจะได้ตามเป้า',
+  h:'ใส่จำนวนที่ถือ ราคาซื้อ และปันผลต่อหน่วยต่อปี (ดูจากประกาศของบริษัท) แล้วตั้ง "เป้าปันผลต่อเดือน" เพื่อดูว่าต้องมีอีกกี่หน่วย ปันผลไม่ใช่เงินที่รับประกัน บริษัทเปลี่ยนจำนวนได้ทุกปี',
+  f:[['sh','จำนวนที่ถือ (หน่วย)',100],['price','ราคาซื้อเฉลี่ย (บาท/หน่วย)',20],['dps','ปันผลต่อหน่วยต่อปี (บาท)',1],['tax','ภาษีหัก ณ ที่จ่าย (%) — ปรับตามจริง',10],['goal','เป้าปันผลสุทธิต่อเดือน (บาท)',5000]],
+  run:v=>{const k=1-v.tax/100,g=v.sh*v.dps,net=g*k;
+   let o=row('Dividend Yield (ต่อราคาซื้อ)',v.price>0?nf(v.dps/v.price*100,2)+'%':'-','text-emerald-400 text-base')+row('ปันผลก่อนหัก/ปี',nf(g,2)+' ฿')+row('ปันผลสุทธิ/ปี',nf(net,2)+' ฿')+row('เฉลี่ยต่อเดือน',nf(net/12,2)+' ฿')+row('เงินลงทุนรวม',nf(v.sh*v.price)+' ฿');
+   o+=box('🎲 ถ้าบริษัทเปลี่ยนปันผล',tbl(['ปันผล/หน่วย','สุทธิ/ปี','เฉลี่ย/เดือน'],[.5,.8,1,1.2].map(f=>[nf(v.dps*f,2)+' ('+(f*100-100>=0?'+':'')+nf(f*100-100)+'%)',nf(v.sh*v.dps*f*k),nf(v.sh*v.dps*f*k/12)])));
+   if(v.dps>0&&v.goal>0){const u=Math.ceil(v.goal*12/(v.dps*k)),more=Math.max(0,u-v.sh);
+    o+=box('🎯 แผนไปให้ถึงเป้า '+nf(v.goal)+' ฿/เดือน','<ol class="list-decimal space-y-1 pl-5"><li>ต้องถือประมาณ <b>'+nf(u)+' หน่วย</b> (ที่ปันผล '+nf(v.dps,2)+' ฿/หน่วย)</li><li>'+(more?'ต้องซื้อเพิ่มอีก <b>'+nf(more)+' หน่วย</b> ≈ <b>'+nf(more*v.price)+' ฿</b>':'ถึงเป้าแล้ว 🎉')+'</li>'+(more?'<li>ถ้าทยอยซื้อเดือนละ 5,000 ฿ ใช้เวลาราว <b>'+Math.ceil(more*v.price/5000)+' เดือน</b> (ยังไม่นับราคาที่ขยับ)</li>':'')+'</ol>','border-emerald-500/30')}
+   return o}},
+ avg:{g:'📈 ลงทุน',n:'⚖️ ต้นทุนเฉลี่ย',d:'ซื้อหลายรอบคนละราคา ต้นทุนเฉลี่ยเท่าไร และถ้าซื้อเพิ่มจะเปลี่ยนอย่างไร',
+  h:'พิมพ์รอบซื้อรอบละบรรทัด รูปแบบ จำนวน,ราคา ใส่ราคาปัจจุบันเพื่อดูกำไรขาดทุน และใส่แผนซื้อเพิ่มเพื่อดูว่าต้นทุนเฉลี่ยจะลดลงเท่าไร',
+  f:[['rows','รอบซื้อ (จำนวน,ราคา)','100,20\n100,18\n50,25','area'],['fee','ค่าคอมฯ+VAT โดยประมาณ (%)',0.157],['cur','ราคาปัจจุบัน (บาท)',0],['nq','แผนซื้อเพิ่ม: จำนวน (หน่วย)',0],['np','แผนซื้อเพิ่ม: ราคา (บาท)',0]],
+  run:v=>{const L=lines(v.rows).map(a=>[+a[0]||0,+a[1]||0]).filter(a=>a[0]>0),f=1+v.fee/100;
+   if(!L.length)return '<p class="text-slate-400">ใส่รอบซื้ออย่างน้อย 1 บรรทัด</p>';
+   let u=0,c=0;const R=L.map((a,i)=>{u+=a[0];c+=a[0]*a[1]*f;return [i+1,nf(a[0]),nf(a[1],2),nf(u),nf(c/u,3)]});
+   let o=row('จำนวนรวม',nf(u)+' หน่วย')+row('ต้นทุนรวม',nf(c,2)+' ฿')+row('ต้นทุนเฉลี่ย/หน่วย',nf(c/u,3)+' ฿','text-emerald-400 text-base')+row('ราคาขายที่เริ่มเท่าทุน (ประมาณ)',nf(c/u/(1-v.fee/100),3)+' ฿');
    if(v.cur>0){const pl=u*v.cur-c;o+=row('มูลค่าตอนนี้',nf(u*v.cur,2)+' ฿')+row('กำไร/ขาดทุน',(pl>=0?'+':'')+nf(pl,2)+' ฿ ('+nf(pl/c*100,2)+'%)',pl>=0?'text-emerald-400':'text-rose-400')}
+   o+=fold('🧾 ต้นทุนเฉลี่ยหลังแต่ละรอบ',tbl(['รอบ','จำนวน','ราคา','สะสม','เฉลี่ยหลังรอบ'],R));
+   if(v.nq>0&&v.np>0){const c2=c+v.nq*v.np*f,u2=u+v.nq,a2=c2/u2;o+=box('🛒 ถ้าซื้อเพิ่ม '+nf(v.nq)+' หน่วยที่ '+nf(v.np,2)+' ฿','<ol class="list-decimal space-y-1 pl-5"><li>ใช้เงินเพิ่ม <b>'+nf(v.nq*v.np*f)+' ฿</b></li><li>ต้นทุนเฉลี่ยใหม่ <b>'+nf(a2,3)+' ฿</b> ('+(a2<=c/u?'ลดลง ':'เพิ่มขึ้น ')+nf(Math.abs(a2-c/u),3)+' ฿)</li><li>ถือรวม <b>'+nf(u2)+' หน่วย</b></li></ol><p class="mt-2 text-xs text-slate-400">ซื้อเฉลี่ยลงช่วยลดต้นทุน แต่ไม่ได้ทำให้หุ้นดีขึ้น ควรเช็คว่าเหตุผลที่ซื้อยังอยู่</p>','border-emerald-500/30')}
    return o}},
- loan:{g:'💳 หนี้สิน',n:'🏦 ตารางผ่อน / ปิดหนี้เร็วขึ้น',d:'สินเชื่อผ่อนเท่ากันทุกเดือน ลองใส่ยอดโปะเพิ่มเพื่อดูว่าประหยัดดอกเบี้ยได้เท่าไร',
-  f:[['P','ยอดกู้ (บาท)',500000],['rate','ดอกเบี้ยต่อปี (%)',7],['n','ผ่อนกี่เดือน',60],['ex','โปะเพิ่มต่อเดือน (บาท)',0]],
-  run:v=>{const r=v.rate/1200,pay=r?v.P*r/(1-Math.pow(1+r,-v.n)):v.P/v.n,base=pay*v.n-v.P;
-   let b=v.P,m=0,int=0;while(b>.005&&m<1200){const i=b*r;int+=i;const p=pay+v.ex;b=p>=b+i?0:b+i-p;m++}
-   let o=row('ผ่อนต่อเดือน',nf(pay,2)+' ฿','text-emerald-400 text-base')+row('ดอกเบี้ยรวม (ไม่โปะ)',nf(base)+' ฿')+row('จ่ายรวม (ไม่โปะ)',nf(pay*v.n)+' ฿');
-   if(v.ex>0)o+=row('เมื่อโปะเพิ่ม: ปิดหนี้ใน',m+' เดือน (เร็วขึ้น '+(v.n-m)+' เดือน)')+row('ดอกเบี้ยที่ประหยัดได้',nf(base-int)+' ฿','text-emerald-400');
+ loan:{g:'💳 หนี้สิน',n:'🏦 ตารางผ่อน / ปิดหนี้เร็วขึ้น',d:'สินเชื่อผ่อนเท่ากันทุกเดือน ดูว่าโปะเพิ่มแล้วประหยัดได้เท่าไร',
+  h:'ใส่ยอดกู้ ดอกเบี้ยต่อปี และจำนวนเดือน ผลคือยอดผ่อนต่อเดือน กราฟเส้นแสดงหนี้คงเหลือ และตารางเทียบว่าโปะเพิ่มเดือนละเท่าไรจะปิดเร็วขึ้นกี่เดือน (ดอกเบี้ยจริงของสถาบันการเงินอาจคิดต่างจากสูตรนี้เล็กน้อย)',
+  f:[['P','ยอดกู้ (บาท)',500000],['rate','ดอกเบี้ยต่อปี (%)',7],['n','ผ่อนกี่เดือน',60],['ex','โปะเพิ่มต่อเดือน (บาท)',1000]],
+  run:v=>{if(v.P<=0||v.n<1)return '<p class="text-slate-400">ใส่ยอดกู้และจำนวนเดือน</p>';
+   const r=v.rate/1200,pay=r?v.P*r/(1-Math.pow(1+r,-v.n)):v.P/v.n;
+   const sim=ex=>{let b=v.P,m=0,int=0,yp=0,yi=0;const hist=[b],yr=[];while(b>.005&&m<1200){const i=b*r,p=Math.min(pay+ex,b+i);b=Math.max(0,b-(p-i));int+=i;m++;hist.push(b);yp+=p;yi+=i;if(m%12===0||b<=.005){yr.push([Math.ceil(m/12),nf(yp),nf(yp-yi),nf(yi),nf(b)]);yp=0;yi=0}}return {m,int,hist,yr}};
+   const B=sim(0),E=sim(v.ex),i1=v.P*r;
+   let o=row('ผ่อนต่อเดือน',nf(pay,2)+' ฿','text-emerald-400 text-base')+row('เดือนแรกแบ่งเป็น','ต้น '+nf(pay-i1)+' + ดอก '+nf(i1)+' ฿')+row('ดอกเบี้ยรวม (ไม่โปะ)',nf(B.int)+' ฿')+row('จ่ายรวม (ไม่โปะ)',nf(v.P+B.int)+' ฿');
+   const S=[{n:'ไม่โปะ',c:'#94a3b8',p:B.hist}];
+   if(v.ex>0){S.push({n:'โปะ '+nf(v.ex)+' ฿/เดือน',c:'#34d399',p:E.hist});o+=row('เมื่อโปะ: ปิดหนี้ใน',E.m+' เดือน (เร็วขึ้น '+(B.m-E.m)+' เดือน)','text-emerald-400')+row('ดอกเบี้ยที่ประหยัดได้',nf(B.int-E.int)+' ฿','text-emerald-400')}
+   o+=chart(S,'เดือน')+box('🔎 โปะเพิ่มเท่าไรดี',tbl(['โปะ/เดือน','ปิดใน (เดือน)','ดอกเบี้ยรวม','ประหยัด'],[0,500,1000,2000,5000].map(x=>{const s=sim(x);return [nf(x),s.m,nf(s.int),nf(B.int-s.int)]})));
+   o+=fold('📅 ตารางรายปี'+(v.ex>0?' (แบบโปะเพิ่ม)':''),tbl(['ปีที่','จ่ายรวม','ตัดต้น','ดอกเบี้ย','คงเหลือ'],E.yr));
+   o+=box('✅ แผนที่ทำตามได้','<ol class="list-decimal space-y-1 pl-5"><li>ตั้งผ่อนอัตโนมัติ <b>'+nf(pay+v.ex,2)+' ฿</b> ทุกเดือน</li><li>ก่อนโปะ เช็คกับผู้ให้กู้ว่ามีค่าธรรมเนียมชำระก่อนกำหนดหรือไม่ และเงินที่โปะถูกตัดเป็นเงินต้นหรือไม่</li><li>ถ้าดอกเบี้ยหนี้สูงกว่าผลตอบแทนลงทุนที่คาดหวัง การโปะหนี้มักคุ้มกว่า แต่ควรเก็บเงินสำรองฉุกเฉินไว้ก่อน</li></ol>','border-emerald-500/30');
    return o}},
- debt:{g:'💳 หนี้สิน',n:'⛄ Snowball vs Avalanche',d:'หลายหนี้พร้อมกัน เริ่มปิดแบบไหนดีกว่า พิมพ์หนี้ละบรรทัด รูปแบบ: ชื่อ,ยอดคงเหลือ,ดอกเบี้ย%ต่อปี,ผ่อนขั้นต่ำต่อเดือน',
+ debt:{g:'💳 หนี้สิน',n:'⛄ Snowball vs Avalanche',d:'หลายหนี้พร้อมกัน เทียบสองวิธี พร้อมแผนจ่ายรายเดือนที่ทำตามได้',
+  h:'พิมพ์หนี้ละบรรทัด รูปแบบ ชื่อ,ยอดคงเหลือ,ดอกเบี้ย%ต่อปี,ผ่อนขั้นต่ำต่อเดือน แล้วใส่เงินที่โปะเพิ่มได้ต่อเดือน (ถ้าไม่ใส่ก็ยังคำนวณได้แต่ช้า) เลือกดูแผนของวิธีไหนก็ได้จากปุ่มด้านล่าง',
   f:[['rows','รายการหนี้','บัตรเครดิต,50000,18,2500\nผ่อนมือถือ,12000,0,1000\nสินเชื่อส่วนบุคคล,120000,22,4000','area'],['ex','เงินที่โปะเพิ่มได้ต่อเดือน (บาท)',3000]],
   run:v=>{const ds=lines(v.rows).map(a=>({n:a[0],b:+a[1]||0,r:+a[2]||0,min:+a[3]||0})).filter(d=>d.b>0);
    if(!ds.length)return '<p class="text-slate-400">ใส่รายการหนี้อย่างน้อย 1 บรรทัด</p>';
-   const S=payoff(ds,v.ex,'snow'),A=payoff(ds,v.ex,'ava');
-   const blk=(t,x)=>`<div class="rounded-xl bg-slate-950/70 p-3"><b>${t}</b>${x.ok?row('ปิดหนี้หมดใน',x.m+' เดือน')+row('ดอกเบี้ยรวม',nf(x.int)+' ฿')+row('ลำดับที่ปิด',esc(x.order.join(' → '))):'<p class="mt-1 text-rose-400">ไม่หมดภายใน 50 ปี — ยอดที่จ่ายอาจไม่พอครอบคลุมดอกเบี้ย</p>'}</div>`;
-   return `<div class="space-y-3">${blk('⛄ Snowball (ปิดยอดน้อยสุดก่อน)',S)}${blk('🏔️ Avalanche (ปิดดอกเบี้ยสูงสุดก่อน)',A)}</div>`+(S.ok&&A.ok?`<p class="mt-3 text-xs text-slate-400">Avalanche ประหยัดดอกเบี้ยกว่า ${nf(Math.max(0,S.int-A.int))} ฿ ส่วน Snowball ให้กำลังใจเร็วเพราะปิดก้อนเล็กได้ไว เลือกแบบที่คุณทำต่อได้จริง</p>`:'')}},
+   const S=payoff(ds,v.ex,'snow'),A=payoff(ds,v.ex,'ava'),X=dMode==='ava'?A:S,nm=dMode==='ava'?'Avalanche':'Snowball';
+   if(!X.ok)return '<p class="text-rose-400">ยอดที่จ่ายยังไม่พอครอบคลุมดอกเบี้ยจนหนี้ไม่ลดภายใน 50 ปี ลองเพิ่มยอดผ่อนขั้นต่ำหรือเงินโปะ</p>';
+   const chips=`<div class="flex gap-2"><button class="chip ${dMode==='ava'?'on':''}" onclick="dMode='ava';runTool()">🏔️ Avalanche</button><button class="chip ${dMode==='snow'?'on':''}" onclick="dMode='snow';runTool()">⛄ Snowball</button></div>`;
+   const sv=S.int-A.int,fa=S.m-A.m;
+   let o=chips+box('📌 สรุปเทียบสองวิธี',tbl(['','ปิดหมดใน','ดอกเบี้ยรวม'],[['🏔️ Avalanche (ดอกสูงก่อน)',A.m+' เดือน',nf(A.int)+' ฿'],['⛄ Snowball (ยอดน้อยก่อน)',S.m+' เดือน',nf(S.int)+' ฿']])+'<p class="mt-2">'+(sv>0.5?'Avalanche ประหยัดดอกเบี้ยกว่า <b>'+nf(sv)+' ฿</b>'+(fa>0?' และเร็วกว่า <b>'+fa+' เดือน</b>':''):'สองวิธีให้ผลใกล้เคียงกัน เลือกแบบที่ทำต่อได้ง่ายกว่า')+' • Snowball ให้กำลังใจเพราะเห็นหนี้ก้อนเล็กหายไวกว่า</p>');
+   o+=chart([{n:'Avalanche',c:'#34d399',p:A.hist.map(x=>x.rem)},{n:'Snowball',c:'#f59e0b',p:S.hist.map(x=>x.rem)}],'เดือน');
+   const h1=X.hist[1];
+   o+=box('✅ แผนเดือนนี้ ('+nm+')',tbl(['หนี้','ขั้นต่ำ','โปะเพิ่ม','จ่ายรวม'],ds.map(d=>{const p=h1.pay[d.n]||0,e=Math.max(0,p-d.min);return [esc(d.n)+(d.n===h1.tgt?' 🎯':''),nf(d.min),e>0?'<b class="text-emerald-400">+'+nf(e)+'</b>':'-',nf(p)]}).concat([['<b>รวมทั้งเดือน</b>','','','<b>'+nf(h1.paid)+'</b>']]))+'<p class="mt-2 text-xs text-slate-400">🎯 = ตัวที่รับเงินโปะเดือนนี้</p>','border-emerald-500/30');
+   o+=box('🗺️ แผนทั้งเส้นทาง',(X.events.length?'<ol class="list-decimal space-y-1 pl-5">'+X.events.map((e,i)=>'<li>เดือนที่ <b>'+e.m+'</b>: ปิด <b>'+esc(e.n)+'</b> ได้ → ย้ายเงิน '+nf(e.min)+' ฿ ที่เคยผ่อนตัวนี้ ไปโปะตัวถัดไป'+(i===X.events.length-1?' (หนี้หมด 🎉)':'')+'</li>').join('')+'</ol>':'')+'<p class="mt-2">กฎเหล็ก: จ่ายขั้นต่ำทุกตัวให้ตรงเวลา และ <b>ไม่ลดยอดรวมที่จ่ายต่อเดือน</b> แม้ปิดหนี้ได้บางตัวแล้ว เงินก้อนนั้นคือแรงที่ทำให้หนี้ที่เหลือหายเร็วขึ้น</p>');
+   o+=fold('📅 ตารางรายเดือน ('+nm+')',tbl(['เดือน','จ่ายรวม','ดอกเบี้ย','หนี้คงเหลือ','โปะให้'],X.hist.slice(1).map(x=>[x.m,nf(x.paid),nf(x.int),nf(x.rem),esc(x.tgt||'-')])));
+   return o}},
  dti:{g:'💳 หนี้สิน',n:'📊 สัดส่วนหนี้ต่อรายได้ (DTI)',d:'ภาระผ่อนหนี้ต่อเดือนรวมกันกินรายได้กี่ %',
+  h:'ใส่รายได้ต่อเดือนก่อนหักภาษี และยอดผ่อนหนี้ทุกก้อนรวมกัน (บัตร บ้าน รถ ผ่อนของ) เส้นขีดบนแถบคือ 30% และ 40% ซึ่งเป็นแนวทางทั่วไป ไม่ใช่เกณฑ์ของสถาบันการเงินใดโดยเฉพาะ',
   f:[['inc','รายได้ต่อเดือน (บาท)',30000],['debt','ผ่อนหนี้รวมต่อเดือน (บาท)',9000]],
-  run:v=>{if(v.inc<=0)return '<p class="text-slate-400">ใส่รายได้ต่อเดือน</p>';const d=v.debt/v.inc*100,s=d<=30?['text-emerald-400','ค่อนข้างสบาย']:d<=40?['text-amber-300','เริ่มตึง']:['text-rose-400','สูง ควรระวัง'];
-   return row('DTI',nf(d,1)+'%',s[0]+' text-base')+row('ประเมินคร่าวๆ',s[1],s[0])+row('เหลือใช้หลังผ่อน',nf(v.inc-v.debt)+' ฿')+'<p class="mt-3 text-xs text-slate-400">เกณฑ์เป็นแนวทางทั่วไป สถาบันการเงินแต่ละแห่งใช้เกณฑ์ไม่เท่ากัน</p>'}}
+  run:v=>{if(v.inc<=0)return '<p class="text-slate-400">ใส่รายได้ต่อเดือน</p>';const d=v.debt/v.inc*100,s=d<=30?['text-emerald-400','bg-emerald-500','ค่อนข้างสบาย']:d<=40?['text-amber-300','bg-amber-400','เริ่มตึง']:['text-rose-400','bg-rose-500','สูง ควรระวัง'];
+   const cut=t=>Math.max(0,v.debt-v.inc*t/100),up=t=>Math.max(0,v.debt/(t/100)-v.inc);
+   let o=row('DTI',nf(d,1)+'%',s[0]+' text-base')+row('ประเมินคร่าวๆ',s[2],s[0])+row('เหลือใช้หลังผ่อน',nf(v.inc-v.debt)+' ฿')
+    +`<div class="relative mt-3 h-3 rounded-full bg-slate-800"><div class="h-3 rounded-full ${s[1]}" style="width:${Math.min(100,d)}%"></div><i class="absolute top-0 h-3 w-px bg-white/70" style="left:30%"></i><i class="absolute top-0 h-3 w-px bg-white/70" style="left:40%"></i></div><div class="relative mb-1 h-4 text-[10px] text-slate-500"><span class="absolute" style="left:30%;transform:translateX(-50%)">30%</span><span class="absolute" style="left:40%;transform:translateX(-50%)">40%</span></div>`;
+   o+=box('✅ แผนปรับให้สบายขึ้น',d<=30?'<p>อยู่ในระดับสบาย 👍 รักษาไว้ และเก็บเงินสำรองฉุกเฉินต่อ</p>':tbl(['เป้า DTI','ลดผ่อนลง/เดือน','หรือรายได้เพิ่มเป็น'],[30,40].filter(t=>d>t).map(t=>['≤ '+t+'%',nf(cut(t))+' ฿',nf(v.inc+up(t))+' ฿']))+'<ol class="mt-2 list-decimal space-y-1 pl-5"><li>ห้ามก่อหนี้ใหม่เพิ่มระหว่างปรับ</li><li>วางแผนปิดหนี้ด้วยเครื่องมือ <a href="#tools/debt" class="text-emerald-400 underline">Snowball vs Avalanche</a></li><li>หารายได้เพิ่มหรือรวมหนี้ดอกสูงให้เป็นหนี้ดอกต่ำกว่า (ตรวจเงื่อนไขและค่าธรรมเนียมก่อน)</li></ol>','border-emerald-500/30');
+   return o}}
 };
 let tool=null,shownTool;
 function renderTools(){
@@ -413,7 +466,7 @@ function renderTools(){
   $('tHead').classList.toggle('hidden',!!T);$('tGrid').classList.toggle('hidden',!!T);$('tPanel').classList.toggle('hidden',!T);
   if(!T){const gs={};Object.keys(TOOLS).forEach(k=>(gs[TOOLS[k].g]=gs[TOOLS[k].g]||[]).push(k));
     $('tGrid').innerHTML=Object.keys(gs).map(g=>`<div><h3 class="mb-2 text-sm font-bold text-slate-300">${g}</h3><div class="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-6">${gs[g].map(k=>tile('#tools/'+k,TOOLS[k].n.split(' ')[0],TOOLS[k].n.slice(TOOLS[k].n.indexOf(' ')+1))).join('')}</div></div>`).join('');return}
-  $('tForm').innerHTML=`<h3 class="text-base font-bold">${T.n}</h3><p class="text-xs text-slate-400">${T.d}</p>`+T.f.map(([k,l,d,t])=>t==='area'?`<label class="block text-xs text-slate-400">${l}<textarea id="tf_${k}" rows="5" oninput="runTool()" class="inp mt-1 font-mono text-sm">${d}</textarea></label>`:`<label class="block text-xs text-slate-400">${l}<input id="tf_${k}" type="number" step="any" inputmode="decimal" value="${d}" oninput="runTool()" class="inp mt-1" /></label>`).join('');
+  $('tForm').innerHTML=`<h3 class="text-base font-bold">${T.n}</h3><p class="text-xs text-slate-400">${T.d}</p>${T.h?`<details class="rounded-lg bg-slate-950/60 p-2 text-xs text-slate-300"><summary class="cursor-pointer font-semibold text-emerald-300">💡 วิธีใช้และอ่านผล</summary><p class="mt-1.5 leading-relaxed">${T.h}</p></details>`:''}`+T.f.map(([k,l,d,t])=>t==='area'?`<label class="block text-xs text-slate-400">${l}<textarea id="tf_${k}" rows="5" oninput="runTool()" class="inp mt-1 font-mono text-sm">${d}</textarea></label>`:`<label class="block text-xs text-slate-400">${l}<input id="tf_${k}" type="number" step="any" inputmode="decimal" value="${d}" oninput="runTool()" class="inp mt-1" /></label>`).join('');
   runTool();
 }
 function runTool(){const v={};TOOLS[tool].f.forEach(([k,,,t])=>{const e=$('tf_'+k);v[k]=t==='area'?e.value:(parseFloat(e.value)||0)});$('tOut').innerHTML=TOOLS[tool].run(v)}
