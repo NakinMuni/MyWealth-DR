@@ -29,15 +29,17 @@
     <nav class="hidden gap-1 md:flex">
       <a data-nav="home" href="#home" class="rounded-lg px-4 py-2 text-sm font-medium text-slate-300 hover:bg-slate-800">🏠 กระดานหลัก</a>
       <a data-nav="analyze" href="#analyze" class="rounded-lg px-4 py-2 text-sm font-medium text-slate-300 hover:bg-slate-800">⭐ เริ่มวิเคราะห์</a>
+      <a data-nav="tools" href="#tools" class="rounded-lg px-4 py-2 text-sm font-medium text-slate-300 hover:bg-slate-800">🧰 เครื่องมือ</a>
       <a data-nav="guide" href="#guide" class="rounded-lg px-4 py-2 text-sm font-medium text-slate-300 hover:bg-slate-800">📖 คู่มือ</a>
     </nav>
     <span id="status" class="text-right text-[11px] text-slate-400">กำลังโหลด...</span>
   </div>
 </header>
 
-<nav class="fixed inset-x-0 bottom-0 z-30 grid grid-cols-3 border-t border-slate-800 bg-slate-950/95 backdrop-blur md:hidden" style="padding-bottom:env(safe-area-inset-bottom)">
+<nav class="fixed inset-x-0 bottom-0 z-30 grid grid-cols-4 border-t border-slate-800 bg-slate-950/95 backdrop-blur md:hidden" style="padding-bottom:env(safe-area-inset-bottom)">
   <a data-nav="home" href="#home" class="py-2.5 text-center text-[11px] text-slate-400"><span class="block text-xl">🏠</span>กระดานหลัก</a>
   <a data-nav="analyze" href="#analyze" class="py-2.5 text-center text-[11px] text-slate-400"><span class="block text-xl">⭐</span>เริ่มวิเคราะห์</a>
+  <a data-nav="tools" href="#tools" class="py-2.5 text-center text-[11px] text-slate-400"><span class="block text-xl">🧰</span>เครื่องมือ</a>
   <a data-nav="guide" href="#guide" class="py-2.5 text-center text-[11px] text-slate-400"><span class="block text-xl">📖</span>คู่มือ</a>
 </nav>
 
@@ -102,9 +104,24 @@
     </div>
   </section>
 
+  <!-- ===== หน้า: เครื่องมือ ===== -->
+  <section id="p-tools" class="page space-y-4">
+    <div><h2 class="text-xl font-bold">🧰 เครื่องมือการเงิน</h2><p class="text-xs text-slate-400">คำนวณในเครื่องของคุณ ไม่ส่งข้อมูลออกไปไหน • ผลลัพธ์เป็นประมาณการเพื่อช่วยตัดสินใจ ไม่ใช่คำแนะนำลงทุน</p></div>
+    <div id="tChips" class="flex gap-2 overflow-x-auto pb-1"></div>
+    <div class="grid gap-4 md:grid-cols-2">
+      <div id="tForm" class="space-y-3 rounded-2xl border border-slate-800 bg-slate-900/60 p-4"></div>
+      <div id="tOut" class="rounded-2xl border border-emerald-500/25 bg-slate-900/60 p-4 text-sm"></div>
+    </div>
+  </section>
+
   <!-- ===== หน้า 3: คู่มือ ===== -->
   <section id="p-guide" class="page mx-auto max-w-3xl space-y-3 text-sm leading-relaxed text-slate-300">
-    <h2 class="text-xl font-bold text-white">📖 คู่มือสำหรับมือใหม่</h2>
+    <h2 class="text-xl font-bold text-white">📖 คู่มือ</h2>
+    <div class="grid grid-cols-2 gap-3">
+      <button id="gb-nex" onclick="showGuide('nex')" class="rounded-2xl border p-4 text-left"><span class="text-2xl">🧭</span><b class="mt-1 block text-white">คู่มือ NexDR</b><span class="text-xs text-slate-400">วิธีใช้เว็บนี้</span></button>
+      <button id="gb-inv" onclick="showGuide('inv')" class="rounded-2xl border p-4 text-left"><span class="text-2xl">🎓</span><b class="mt-1 block text-white">คู่มือการลงทุน</b><span class="text-xs text-slate-400">ฉบับมือใหม่ + ศัพท์</span></button>
+    </div>
+    <div id="g-nex" class="space-y-3">
     <details open class="rounded-xl border border-slate-800 bg-slate-900/60 p-4"><summary class="font-bold text-white">1. DR คืออะไร?</summary>
       <p class="mt-2">DR (Depositary Receipt) คือใบรับฝากที่ซื้อขายในตลาดหุ้นไทย แต่ราคาอิงหุ้นต่างประเทศ เช่น AAPL80 อิงหุ้น Apple ทำให้ซื้อหุ้นโลกด้วยเงินบาทได้ ราคา DR จึงขยับตามหุ้นแม่และค่าเงิน</p></details>
     <details class="rounded-xl border border-slate-800 bg-slate-900/60 p-4"><summary class="font-bold text-white">2. อ่านการ์ดหุ้นอย่างไร?</summary>
@@ -123,6 +140,12 @@
       <p class="mt-2">ดาว เป้าหมาย และโน้ตเก็บในเบราว์เซอร์เครื่องนี้เท่านั้น ถ้าจะย้ายเครื่องหรือล้างแคช ให้สำรองไว้ก่อน</p>
       <div class="mt-3 flex flex-wrap items-center gap-2"><button onclick="exportData()" class="rounded-lg bg-emerald-500 px-4 py-2 font-bold text-slate-950">⬇️ ดาวน์โหลดไฟล์สำรอง</button>
       <label class="rounded-lg border border-slate-600 px-4 py-2 text-slate-200">⬆️ กู้คืนจากไฟล์<input type="file" accept=".json" onchange="importData(event)" class="hidden" /></label></div></details>
+    </div>
+    <div id="g-inv" class="hidden space-y-3">
+      <div class="rounded-xl border border-amber-500/30 bg-amber-950/10 p-3 text-xs text-amber-200">เนื้อหาเป็นความรู้ทั่วไปเพื่อการศึกษา ไม่ใช่คำแนะนำลงทุน การลงทุนมีความเสี่ยง อาจขาดทุนเงินต้น ควรศึกษาข้อมูลเพิ่มเติมจากแหล่งทางการ เช่น ตลาดหลักทรัพย์ฯ และ ก.ล.ต.</div>
+      <input id="gq" oninput="renderGloss()" class="inp" placeholder="🔍 ค้นหาคำศัพท์ เช่น ปันผล, DCA, P/E" />
+      <div id="gloss" class="space-y-2"></div>
+    </div>
     <p class="pt-4 text-center text-xs text-slate-500">NexDR • Designed & Engineered By. NakinMuni</p>
   </section>
 </main>
@@ -176,10 +199,10 @@ const toast=m=>{const t=$('toast');t.textContent=m;t.classList.remove('hidden');
 
 // ---------- ระบบหน้า (hash routing) ----------
 function route(){
-  const p=(location.hash||'#home').slice(1); const name=['home','analyze','guide'].includes(p)?p:'home';
+  const p=(location.hash||'#home').slice(1); const name=['home','analyze','tools','guide'].includes(p)?p:'home';
   document.querySelectorAll('.page').forEach(e=>e.classList.toggle('on',e.id==='p-'+name));
   document.querySelectorAll('[data-nav]').forEach(a=>{const on=a.dataset.nav===name;a.classList.toggle('text-emerald-400',on);a.classList.toggle('bg-slate-800',on&&a.parentElement.classList.contains('md:flex'));a.classList.toggle('text-slate-400',!on&&!a.parentElement.classList.contains('md:flex'))});
-  window.scrollTo(0,0); if(name==='guide')$('mkt').textContent=marketNow();
+  window.scrollTo(0,0); if(name==='guide')$('mkt').textContent=marketNow(); if(name==='tools'&&!$('tForm').innerHTML)renderTools();
 }
 window.addEventListener('hashchange',route);
 
@@ -321,8 +344,104 @@ function importData(e){
 }
 function closeWelcome(){localStorage.setItem(WEL_KEY,'1');$('welcome').classList.add('hidden')}
 
+
+// ---------- เครื่องมือการเงิน ----------
+const nf=(v,d=0)=>Number(v).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
+const row=(l,v,c='')=>`<div class="flex justify-between gap-3 border-b border-slate-800/70 py-2 last:border-0"><span class="text-slate-400">${l}</span><b class="num text-right ${c}">${v}</b></div>`;
+const lines=t=>String(t).split('\n').map(l=>l.split(',').map(x=>x.trim())).filter(a=>a.length>=2&&a[0]);
+function payoff(ds,extra,mode){
+  ds=ds.map(d=>({...d})); let m=0,int=0,order=[];
+  while(ds.some(d=>d.b>.005)&&m<600){
+    m++; ds.forEach(d=>{if(d.b>0){const i=d.b*d.r/1200;d.b+=i;int+=i}});
+    let pool=extra; ds.forEach(d=>{if(d.b>.005){const p=Math.min(d.min,d.b);d.b-=p;pool+=d.min-p}else pool+=d.min});
+    ds.filter(d=>d.b>.005).sort(mode==='snow'?(a,b)=>a.b-b.b:(a,b)=>b.r-a.r).forEach(d=>{const p=Math.min(pool,d.b);d.b-=p;pool-=p});
+    ds.forEach(d=>{if(!d.done&&d.b<=.005){d.done=1;order.push(d.n)}});
+  }
+  return {m,int,order,ok:!ds.some(d=>d.b>.005)};
+}
+const TOOLS={
+ dca:{n:'📈 DCA / ดอกเบี้ยทบต้น',d:'ลงทุนสม่ำเสมอทุกเดือน ผลตอบแทนทบต้นแล้วจะเป็นเท่าไร (ผลตอบแทนจริงไม่แน่นอน ใส่ค่าที่ระมัดระวังไว้ก่อน)',
+  f:[['init','เงินก้อนแรก (บาท)',0],['pmt','ลงทุนต่อเดือน (บาท)',3000],['yrs','ระยะเวลา (ปี)',10],['ret','ผลตอบแทนคาดหวังต่อปี (%)',6]],
+  run:v=>{const r=v.ret/1200,n=v.yrs*12,g=Math.pow(1+r,n),fv=v.init*g+(r?v.pmt*(g-1)/r:v.pmt*n),inv=v.init+v.pmt*n;
+   return row('เงินต้นที่ใส่ไปทั้งหมด',nf(inv)+' ฿')+row('มูลค่าที่คาดว่าจะได้',nf(fv)+' ฿','text-emerald-400 text-base')+row('กำไรจากการทบต้น',nf(fv-inv)+' ฿')+row('คิดเป็น',inv>0?nf((fv/inv-1)*100,1)+'% ของเงินต้น':'-')}},
+ div:{n:'💵 คำนวณเงินปันผล',d:'ถือกี่หน่วย ได้ปันผลเท่าไรต่อปี และ Dividend Yield เท่าไร',
+  f:[['sh','จำนวนที่ถือ (หน่วย)',100],['price','ราคาซื้อเฉลี่ย (บาท/หน่วย)',20],['dps','ปันผลต่อหน่วยต่อปี (บาท)',1],['tax','ภาษีหัก ณ ที่จ่าย (%) — ปรับตามจริง',10]],
+  run:v=>{const g=v.sh*v.dps,net=g*(1-v.tax/100);
+   return row('Dividend Yield (ต่อราคาซื้อ)',v.price>0?nf(v.dps/v.price*100,2)+'%':'-','text-emerald-400 text-base')+row('ปันผลก่อนหัก/ปี',nf(g,2)+' ฿')+row('ปันผลสุทธิ/ปี',nf(net,2)+' ฿')+row('เฉลี่ยต่อเดือน',nf(net/12,2)+' ฿')+row('เงินลงทุนรวม',nf(v.sh*v.price)+' ฿')}},
+ avg:{n:'⚖️ ต้นทุนเฉลี่ย',d:'ซื้อหลายรอบคนละราคา ต้นทุนเฉลี่ยเท่าไร กำไร/ขาดทุนตอนนี้เป็นอย่างไร พิมพ์รอบละบรรทัด รูปแบบ: จำนวน,ราคา',
+  f:[['rows','รอบซื้อ (จำนวน,ราคา)','100,20\n100,18\n50,25','area'],['fee','ค่าคอมฯ+VAT โดยประมาณ (%)',0.157],['cur','ราคาปัจจุบัน (บาท)',0]],
+  run:v=>{const L=lines(v.rows).map(a=>[+a[0]||0,+a[1]||0]),u=L.reduce((s,a)=>s+a[0],0),c=L.reduce((s,a)=>s+a[0]*a[1],0)*(1+v.fee/100);
+   if(!u)return '<p class="text-slate-400">ใส่รอบซื้ออย่างน้อย 1 บรรทัด</p>';
+   let o=row('จำนวนรวม',nf(u)+' หน่วย')+row('ต้นทุนรวม',nf(c,2)+' ฿')+row('ต้นทุนเฉลี่ย/หน่วย',nf(c/u,3)+' ฿','text-emerald-400 text-base');
+   if(v.cur>0){const pl=u*v.cur-c;o+=row('มูลค่าตอนนี้',nf(u*v.cur,2)+' ฿')+row('กำไร/ขาดทุน',(pl>=0?'+':'')+nf(pl,2)+' ฿ ('+nf(pl/c*100,2)+'%)',pl>=0?'text-emerald-400':'text-rose-400')}
+   return o}},
+ loan:{n:'🏦 ตารางผ่อน / ปิดหนี้เร็วขึ้น',d:'สินเชื่อผ่อนเท่ากันทุกเดือน ลองใส่ยอดโปะเพิ่มเพื่อดูว่าประหยัดดอกเบี้ยได้เท่าไร',
+  f:[['P','ยอดกู้ (บาท)',500000],['rate','ดอกเบี้ยต่อปี (%)',7],['n','ผ่อนกี่เดือน',60],['ex','โปะเพิ่มต่อเดือน (บาท)',0]],
+  run:v=>{const r=v.rate/1200,pay=r?v.P*r/(1-Math.pow(1+r,-v.n)):v.P/v.n,base=pay*v.n-v.P;
+   let b=v.P,m=0,int=0;while(b>.005&&m<1200){const i=b*r;int+=i;const p=pay+v.ex;b=p>=b+i?0:b+i-p;m++}
+   let o=row('ผ่อนต่อเดือน',nf(pay,2)+' ฿','text-emerald-400 text-base')+row('ดอกเบี้ยรวม (ไม่โปะ)',nf(base)+' ฿')+row('จ่ายรวม (ไม่โปะ)',nf(pay*v.n)+' ฿');
+   if(v.ex>0)o+=row('เมื่อโปะเพิ่ม: ปิดหนี้ใน',m+' เดือน (เร็วขึ้น '+(v.n-m)+' เดือน)')+row('ดอกเบี้ยที่ประหยัดได้',nf(base-int)+' ฿','text-emerald-400');
+   return o}},
+ debt:{n:'⛄ Snowball vs Avalanche',d:'หลายหนี้พร้อมกัน เริ่มปิดแบบไหนดีกว่า พิมพ์หนี้ละบรรทัด รูปแบบ: ชื่อ,ยอดคงเหลือ,ดอกเบี้ย%ต่อปี,ผ่อนขั้นต่ำต่อเดือน',
+  f:[['rows','รายการหนี้','บัตรเครดิต,50000,18,2500\nผ่อนมือถือ,12000,0,1000\nสินเชื่อส่วนบุคคล,120000,22,4000','area'],['ex','เงินที่โปะเพิ่มได้ต่อเดือน (บาท)',3000]],
+  run:v=>{const ds=lines(v.rows).map(a=>({n:a[0],b:+a[1]||0,r:+a[2]||0,min:+a[3]||0})).filter(d=>d.b>0);
+   if(!ds.length)return '<p class="text-slate-400">ใส่รายการหนี้อย่างน้อย 1 บรรทัด</p>';
+   const S=payoff(ds,v.ex,'snow'),A=payoff(ds,v.ex,'ava');
+   const blk=(t,x)=>`<div class="rounded-xl bg-slate-950/70 p-3"><b>${t}</b>${x.ok?row('ปิดหนี้หมดใน',x.m+' เดือน')+row('ดอกเบี้ยรวม',nf(x.int)+' ฿')+row('ลำดับที่ปิด',esc(x.order.join(' → '))):'<p class="mt-1 text-rose-400">ไม่หมดภายใน 50 ปี — ยอดที่จ่ายอาจไม่พอครอบคลุมดอกเบี้ย</p>'}</div>`;
+   return `<div class="space-y-3">${blk('⛄ Snowball (ปิดยอดน้อยสุดก่อน)',S)}${blk('🏔️ Avalanche (ปิดดอกเบี้ยสูงสุดก่อน)',A)}</div>`+(S.ok&&A.ok?`<p class="mt-3 text-xs text-slate-400">Avalanche ประหยัดดอกเบี้ยกว่า ${nf(Math.max(0,S.int-A.int))} ฿ ส่วน Snowball ให้กำลังใจเร็วเพราะปิดก้อนเล็กได้ไว เลือกแบบที่คุณทำต่อได้จริง</p>`:'')}},
+ dti:{n:'📊 สัดส่วนหนี้ต่อรายได้ (DTI)',d:'ภาระผ่อนหนี้ต่อเดือนรวมกันกินรายได้กี่ %',
+  f:[['inc','รายได้ต่อเดือน (บาท)',30000],['debt','ผ่อนหนี้รวมต่อเดือน (บาท)',9000]],
+  run:v=>{if(v.inc<=0)return '<p class="text-slate-400">ใส่รายได้ต่อเดือน</p>';const d=v.debt/v.inc*100,s=d<=30?['text-emerald-400','ค่อนข้างสบาย']:d<=40?['text-amber-300','เริ่มตึง']:['text-rose-400','สูง ควรระวัง'];
+   return row('DTI',nf(d,1)+'%',s[0]+' text-base')+row('ประเมินคร่าวๆ',s[1],s[0])+row('เหลือใช้หลังผ่อน',nf(v.inc-v.debt)+' ฿')+'<p class="mt-3 text-xs text-slate-400">เกณฑ์เป็นแนวทางทั่วไป สถาบันการเงินแต่ละแห่งใช้เกณฑ์ไม่เท่ากัน</p>'}}
+};
+let tool='dca';
+function renderTools(){
+  $('tChips').innerHTML=Object.keys(TOOLS).map(k=>`<button class="chip ${k===tool?'on':''}" onclick="tool='${k}';renderTools()">${TOOLS[k].n}</button>`).join('');
+  const T=TOOLS[tool];
+  $('tForm').innerHTML=`<h3 class="text-base font-bold">${T.n}</h3><p class="text-xs text-slate-400">${T.d}</p>`+T.f.map(([k,l,d,t])=>t==='area'?`<label class="block text-xs text-slate-400">${l}<textarea id="tf_${k}" rows="5" oninput="runTool()" class="inp mt-1 font-mono text-sm">${d}</textarea></label>`:`<label class="block text-xs text-slate-400">${l}<input id="tf_${k}" type="number" step="any" inputmode="decimal" value="${d}" oninput="runTool()" class="inp mt-1" /></label>`).join('');
+  runTool();
+}
+function runTool(){const v={};TOOLS[tool].f.forEach(([k,,,t])=>{const e=$('tf_'+k);v[k]=t==='area'?e.value:(parseFloat(e.value)||0)});$('tOut').innerHTML=TOOLS[tool].run(v)}
+
+// ---------- คู่มือ 2 การ์ด + ศัพท์ ----------
+function showGuide(k){
+  $('g-nex').classList.toggle('hidden',k!=='nex');$('g-inv').classList.toggle('hidden',k!=='inv');
+  ['nex','inv'].forEach(x=>{$('gb-'+x).className='rounded-2xl border p-4 text-left '+(x===k?'border-emerald-400 bg-emerald-950/30':'border-slate-800 bg-slate-900/60')});
+  if(k==='inv')renderGloss();
+}
+const GLOSS=[
+['หุ้น','หลักทรัพย์ที่แสดงความเป็นเจ้าของบริษัทส่วนหนึ่ง ผู้ถือหวังกำไรจากราคาที่เพิ่มขึ้นและเงินปันผล'],
+['DR (Depositary Receipt)','ใบรับฝากที่ออกโดยบริษัทในไทย อิงหุ้นหรือ ETF ต่างประเทศ ซื้อขายในตลาดหลักทรัพย์ไทยด้วยเงินบาท'],
+['ETF','กองทุนที่ซื้อขายในตลาดเหมือนหุ้น ส่วนใหญ่ลงทุนตามดัชนี เช่น S&P 500'],
+['กองทุนรวม','เงินจากผู้ลงทุนหลายคนรวมกัน ให้ผู้จัดการกองทุนนำไปลงทุน มีค่าธรรมเนียมการจัดการ'],
+['Blue Chip','หุ้นบริษัทขนาดใหญ่ ฐานะการเงินและชื่อเสียงมั่นคง'],
+['Market Cap','มูลค่าบริษัทตามราคาตลาด = ราคาหุ้น × จำนวนหุ้นทั้งหมด'],
+['เงินปันผล (Dividend)','ส่วนแบ่งกำไรที่บริษัทจ่ายให้ผู้ถือหุ้น ไม่ใช่ทุกบริษัทจ่าย และไม่มีการรับประกัน'],
+['Dividend Yield','อัตราปันผลต่อปี = ปันผลต่อหน่วย ÷ ราคา × 100'],
+['EPS','กำไรสุทธิต่อหุ้น = กำไรสุทธิ ÷ จำนวนหุ้น'],
+['P/E','ราคาหุ้น ÷ EPS บอกว่าจ่ายราคากี่เท่าของกำไรต่อปี ควรเทียบกับบริษัทในกลุ่มธุรกิจเดียวกัน'],
+['DCA','ทยอยลงทุนด้วยจำนวนเงินเท่าๆ กันตามรอบเวลา ช่วยลดความเสี่ยงจากการเลือกจังหวะซื้อผิด'],
+['กระจายความเสี่ยง','ไม่ลงทุนทุกอย่างในที่เดียว กระจายหลายธุรกิจ สินทรัพย์ หรือประเทศ'],
+['ความผันผวน (Volatility)','ระดับที่ราคาขึ้นลงแรง ผันผวนสูงมักมีโอกาสได้ผลตอบแทนสูง แต่ก็ขาดทุนหนักได้เช่นกัน'],
+['ขาดทุนที่ยังไม่รับรู้','ราคาลงต่ำกว่าต้นทุนแต่ยังไม่ได้ขาย จะกลายเป็นขาดทุนจริงเมื่อขายออก'],
+['Bid / Offer','Bid คือราคาที่ผู้ซื้อตั้งรอซื้อ Offer คือราคาที่ผู้ขายตั้งรอขาย'],
+['Board Lot / Odd Lot','Board Lot คือหน่วยซื้อขายมาตรฐาน (ปกติ 100 หน่วย) Odd Lot คือเศษที่น้อยกว่านั้น ซึ่งซื้อขายบนกระดานแยก'],
+['Tick Size','ช่วงห่างของราคาที่ตั้งซื้อขายได้ ขึ้นกับระดับราคา เช่น ราคาต่ำๆ ขยับทีละสตางค์'],
+['Fair Value (DR)','ราคาที่ DR ควรเป็นตามราคาหุ้นแม่ × อัตราแลกเปลี่ยน ÷ Ratio'],
+['Premium / Discount','DR ราคาแพงกว่า (Premium) หรือถูกกว่า (Discount) ราคาที่ควรเป็นตามหุ้นแม่'],
+['ความเสี่ยงค่าเงิน','สินทรัพย์ต่างประเทศอิงสกุลเงินอื่น ค่าเงินบาทที่เปลี่ยนมีผลต่อกำไรขาดทุนเมื่อวัดเป็นบาท'],
+['ดอกเบี้ยทบต้น','ดอกเบี้ยที่ถูกนำไปคิดดอกเบี้ยต่อ ยิ่งลงทุนนานยิ่งเห็นผล'],
+['เงินสำรองฉุกเฉิน','เงินสำรองไว้ใช้ยามจำเป็น มักแนะนำราว 3–6 เดือนของรายจ่ายก่อนเริ่มลงทุนจริงจัง'],
+['DTI','สัดส่วนภาระหนี้ต่อเดือน ÷ รายได้ต่อเดือน ใช้ประเมินว่าหนี้หนักเกินไปหรือไม่'],
+['Snowball / Avalanche','วิธีปิดหนี้หลายก้อน: Snowball ปิดยอดน้อยสุดก่อน, Avalanche ปิดดอกเบี้ยสูงสุดก่อน']
+];
+function renderGloss(){
+  const q=$('gq').value.trim().toLowerCase(),L=GLOSS.filter(g=>!q||(g[0]+g[1]).toLowerCase().includes(q));
+  $('gloss').innerHTML=L.map(g=>`<div class="rounded-xl border border-slate-800 bg-slate-900/60 p-3"><b class="text-emerald-300">${g[0]}</b><p class="mt-1 text-[13px]">${g[1]}</p></div>`).join('')||'<p class="py-6 text-center text-slate-400">ไม่พบคำศัพท์นี้</p>';
+}
+
 window.addEventListener('DOMContentLoaded',()=>{
-  route(); if(!localStorage.getItem(WEL_KEY))$('welcome').classList.remove('hidden');
+  showGuide('nex'); route(); if(!localStorage.getItem(WEL_KEY))$('welcome').classList.remove('hidden');
   try{const c=JSON.parse(localStorage.getItem(CACHE_KEY)||'null');if(c&&c.items&&c.items.length)applyPayload(c,true)}catch(e){} // โชว์ข้อมูลเก่าทันทีระหว่างรอของใหม่
   loadData(false);
 });
