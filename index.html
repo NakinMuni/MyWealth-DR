@@ -604,9 +604,10 @@ function mkOpen(id,keep){
   el.innerHTML=`<b>${v.m.ic} ${v.m.n}</b> <span class="${LV[v.l][1]} text-xs">${LV[v.l][0]}</span><p class="mt-2">${v.note}</p><p class="mt-2 text-slate-400">📘 ${v.m.x}</p><p class="mt-2 text-[11px] text-slate-500">ราคา ณ ${it.t?fmtT(it.t):'-'} (เวลาที่ตลาดรายงานล่าสุด) • <a href="#guide/inv" class="text-emerald-400 underline">ดูคำอธิบายศัพท์ในคู่มือ</a></p>`;
   el.classList.remove('hidden');
 }
+const mkOk=d=>d&&Array.isArray(d.items)&&d.items.some(x=>MK[x.id]); // ตรวจว่าเป็นข้อมูลตัวชี้วัดจริง ไม่ใช่ข้อมูลอื่น
 function loadMarkets(force){
-  try{const c=JSON.parse(localStorage.getItem('nexdr_mk_v1')||'null');if(c&&!force&&Date.now()-c.t<600000){mkData=c.d;renderMarkets();return}}catch(e){}
-  fetch(GAS_API_URL+'?markets=1',{credentials:'omit'}).then(r=>r.json()).then(d=>{if(!d.items||!d.items.length)throw 0;mkData=d;try{localStorage.setItem('nexdr_mk_v1',JSON.stringify({t:Date.now(),d}))}catch(e){}renderMarkets()})
+  try{const c=JSON.parse(localStorage.getItem('nexdr_mk_v1')||'null');if(c&&!force&&mkOk(c.d)&&Date.now()-c.t<600000){mkData=c.d;renderMarkets();return}}catch(e){}
+  fetch(GAS_API_URL+'?markets=1',{credentials:'omit'}).then(r=>r.json()).then(d=>{if(!mkOk(d)){console.warn('markets: unexpected response (Code.gs may not be the latest deployed version)');throw 0}mkData=d;try{localStorage.setItem('nexdr_mk_v1',JSON.stringify({t:Date.now(),d}))}catch(e){}renderMarkets()})
   .catch(()=>{if(!mkData)$('mkGrid').innerHTML='<p class="col-span-full py-4 text-sm text-slate-400">โหลดตัวชี้วัดไม่สำเร็จในตอนนี้ ลองรีเฟรชหน้านี้อีกครั้ง</p>'});
 }
 
