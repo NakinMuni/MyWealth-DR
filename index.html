@@ -57,12 +57,10 @@
       <ol class="mt-2 list-decimal space-y-1 pl-5 text-slate-300"><li>เลื่อนดูหุ้นด้านล่าง ตัวที่ติดป้าย <b class="text-emerald-400">🟢 น่าสะสม</b> คือราคาบนกระดานไทยถูกกว่าราคาที่ควรเป็น</li><li>กดดาว ☆ ที่หุ้นที่สนใจ (เลือกแค่ไม่กี่ตัวที่อยากตามจริงๆ)</li><li>ไปหน้า <b>⭐ เริ่มวิเคราะห์</b> เพื่ออัปเดตราคาสดเฉพาะตัวที่ติดดาว</li></ol>
       <a href="#guide" class="mt-2 inline-block text-xs text-emerald-400 underline">อ่านคู่มือฉบับเข้าใจง่าย →</a>
     </div>
-    <div><h2 class="text-xl font-bold">👋 วันนี้มีอะไรน่าสนใจ</h2><p id="hMkt" class="mt-1 text-xs text-slate-400"></p></div>
-    <div id="hTiles" class="grid grid-cols-3 gap-2.5"></div>
-    <div id="hTopBox" class="hidden space-y-2">
-      <div class="flex items-center justify-between"><h3 class="font-bold">🟢 ถูกกว่าหุ้นแม่มากสุดตอนนี้</h3><a href="#board" class="text-xs text-emerald-400">ดูทั้งหมด →</a></div>
-      <div id="hTop" class="grid grid-cols-1 gap-3 sm:grid-cols-3"></div>
-    </div>
+    <div><h2 class="text-xl font-bold">🌍 ภาพรวมตลาดโลก</h2><p id="hMkt" class="mt-1 text-xs text-slate-400"></p></div>
+    <div id="mkGrid" class="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-5"><p class="col-span-full py-4 text-sm text-slate-400">กำลังโหลดตัวชี้วัด...</p></div>
+    <div id="mkDetail" class="hidden rounded-2xl border border-slate-700 bg-slate-900/70 p-4 text-sm leading-relaxed"></div>
+    <p id="mkNote" class="text-[11px] leading-relaxed text-slate-500"></p>
     <div class="space-y-2">
       <div class="flex flex-wrap items-center justify-between gap-2"><h3 class="font-bold">📰 ข่าวตลาดวันนี้</h3>
         <div class="flex gap-1.5"><button class="chip on" data-ntab="th" onclick="setNews('th')">ตลาดหุ้นไทย</button><button class="chip" data-ntab="world" onclick="setNews('world')">ตลาดโลก</button></div></div>
@@ -507,7 +505,13 @@ const GLOSS=[
 ['ดอกเบี้ยทบต้น','ดอกเบี้ยที่ถูกนำไปคิดดอกเบี้ยต่อ ยิ่งลงทุนนานยิ่งเห็นผล'],
 ['เงินสำรองฉุกเฉิน','เงินสำรองไว้ใช้ยามจำเป็น มักแนะนำราว 3–6 เดือนของรายจ่ายก่อนเริ่มลงทุนจริงจัง'],
 ['DTI','สัดส่วนภาระหนี้ต่อเดือน ÷ รายได้ต่อเดือน ใช้ประเมินว่าหนี้หนักเกินไปหรือไม่'],
-['Snowball / Avalanche','วิธีปิดหนี้หลายก้อน: Snowball ปิดยอดน้อยสุดก่อน, Avalanche ปิดดอกเบี้ยสูงสุดก่อน']
+['Snowball / Avalanche','วิธีปิดหนี้หลายก้อน: Snowball ปิดยอดน้อยสุดก่อน, Avalanche ปิดดอกเบี้ยสูงสุดก่อน'],
+['VIX (ดัชนีความกลัว)','วัดว่านักลงทุนคาดว่าหุ้นสหรัฐฯ (S&P 500) จะแกว่งแรงแค่ไหนในอีก 30 วัน ค่าสูง = ตลาดกังวลและผันผวน ค่าต่ำ = ตลาดนิ่ง'],
+['ทองโลก (Gold Futures)','ราคาทองคำล่วงหน้าในตลาดโลก หน่วยดอลลาร์ต่อออนซ์ ไม่ใช่ราคาทองแท่งบาทละของไทย'],
+['น้ำมัน WTI','น้ำมันดิบอ้างอิงของสหรัฐฯ ราคามีผลต่อต้นทุนหลายธุรกิจและหุ้นกลุ่มพลังงาน'],
+['Bitcoin (BTC)','สกุลเงินดิจิทัลที่ใหญ่ที่สุด ซื้อขาย 24 ชม. ผันผวนสูงมาก'],
+['USD/THB','ราคาดอลลาร์สหรัฐเป็นบาท ตัวเลขสูงขึ้น = บาทอ่อน ค่านี้ถูกใช้คำนวณ Fair Value ของ DR'],
+['สินทรัพย์ปลอดภัย (Safe Haven)','สินทรัพย์ที่นักลงทุนมักย้ายเข้าไปถือเมื่อตลาดกังวล เช่น ทองคำ แต่ไม่ได้การันตีว่าจะราคาขึ้นเสมอ']
 ];
 function renderGloss(){
   const q=$('gq').value.trim().toLowerCase(),L=GLOSS.filter(g=>!q||(g[0]+g[1]).toLowerCase().includes(q));
@@ -517,13 +521,7 @@ function renderGloss(){
 
 // ---------- การ์ดสี่เหลี่ยม / หน้าแรก / ข่าว ----------
 const tile=(href,ic,lb,dim)=>`<a ${dim?'':`href="${href}"`} class="flex aspect-square flex-col items-center justify-center gap-1.5 rounded-2xl border p-2 text-center ${dim?'border-slate-800/60 bg-slate-900/30 opacity-50':'border-slate-700 bg-slate-900/70 transition hover:border-emerald-500/50 active:scale-95'}"><span class="text-3xl">${ic}</span><span class="text-[11px] font-medium leading-tight">${lb}</span>${dim?'<span class="text-[9px] text-slate-500">เร็วๆ นี้</span>':''}</a>`;
-function renderHome(){
-  $('hMkt').textContent=marketNow();
-  const st=items.filter(i=>wl.has(i.drSymbol)),disc=items.filter(i=>zoneOf(i)==='DISCOUNT');
-  $('hTiles').innerHTML=[['🟢',disc.length,'น่าสะสมตอนนี้','#board'],['⭐',st.length,'ติดดาว','#analyze'],['🎯',st.filter(hit).length,'ถึงเป้าส่วนตัว','#analyze']].map(t=>`<a href="${t[3]}" class="rounded-2xl border border-slate-800 bg-slate-900/70 p-3 text-center active:scale-95"><p class="text-2xl">${t[0]}</p><p class="text-xl font-bold num">${t[1]}</p><p class="text-[11px] text-slate-400">${t[2]}</p></a>`).join('');
-  const top=disc.filter(i=>i.diffPct!=null).sort((a,b)=>a.diffPct-b.diffPct).slice(0,3);
-  $('hTopBox').classList.toggle('hidden',!top.length);$('hTop').innerHTML=top.map(card).join('');
-}
+function renderHome(){$('hMkt').textContent=marketNow()}
 let newsData=null,newsTab='th';
 const ago=s=>{const t=Date.parse(s);if(!t)return '';const m=Math.max(1,Math.round((Date.now()-t)/60000));return m<60?m+' นาทีที่แล้ว':m<1440?Math.round(m/60)+' ชม.ที่แล้ว':Math.round(m/1440)+' วันที่แล้ว'};
 function setNews(t){newsTab=t;document.querySelectorAll('[data-ntab]').forEach(b=>b.classList.toggle('on',b.dataset.ntab===t));renderNews()}
@@ -563,8 +561,57 @@ function fmtT(ms){
 }
 function tline(i){const ms=i.fetchedMs||fullMs;return ms?`<p class="mt-2 text-[10px] text-slate-500">🕒 ราคาดึงเมื่อ ${fmtT(ms)}${i.fetchedMs&&fullMs&&i.fetchedMs-fullMs>600000?' ⚡':''}</p>`:''}
 
+// ---------- แถบตัวชี้วัดตลาด ----------
+const MK={
+ vix:{n:'VIX',ic:'😨',f:v=>nf(v,2),x:'VIX คือ "ดัชนีความกลัว" วัดว่านักลงทุนคาดว่าหุ้นสหรัฐฯ (S&P 500) จะแกว่งแรงแค่ไหนในอีก 30 วัน ยิ่งสูงยิ่งกังวล หุ้นแม่ของ DR หลายตัวเป็นหุ้นสหรัฐฯ จึงเกี่ยวข้องโดยตรง'},
+ gold:{n:'ทองโลก',ic:'🥇',f:v=>'$'+nf(v,0),x:'ราคาทองคำล่วงหน้าในตลาดโลก หน่วยดอลลาร์ต่อออนซ์ ไม่ใช่ราคาทองแท่งบาทละของไทย มักถูกมองเป็นสินทรัพย์ปลอดภัยเมื่อตลาดกังวล'},
+ oil:{n:'น้ำมัน WTI',ic:'🛢️',f:v=>'$'+nf(v,2),x:'ราคาน้ำมันดิบ WTI ล่วงหน้า หน่วยดอลลาร์ต่อบาร์เรล เป็นต้นทุนของหลายธุรกิจและขยับตามข่าวอุปทาน เศรษฐกิจ และภูมิรัฐศาสตร์ (บางช่วงตัวเลขกระโดดตอนสลับสัญญา)'},
+ btc:{n:'Bitcoin',ic:'₿',f:v=>'$'+nf(v,0),x:'ราคา Bitcoin เป็นดอลลาร์ ซื้อขายตลอด 24 ชั่วโมง ผันผวนสูงกว่าหุ้นทั่วไปมาก มักถูกใช้เป็นมาตรวัดความกล้าเสี่ยงของตลาด'},
+ usdthb:{n:'USD/THB',ic:'💱',f:v=>nf(v,2)+' ฿',x:'ค่าเงินดอลลาร์เป็นบาท ตัวเลขสูงขึ้น = บาทอ่อน ราคา DR คำนวณจาก หุ้นแม่ × ค่าเงิน ÷ Ratio ค่าเงินจึงมีผลต่อ Fair Value โดยตรง'}
+};
+const LV=[['🟢 ปกติ','text-emerald-400'],['🟡 เฝ้าระวัง','text-amber-300'],['🔴 ผันผวนสูง','text-rose-400']];
+function mkLevel(id,v,c,cfg){
+  if(id==='vix'){let l=v>=cfg.vix_high?2:v>=cfg.vix_watch?1:0;if(c>=cfg.vix_spike_pct)l=Math.max(l,1);return l}
+  const m=cfg[id+'_move_pct']||3,a=Math.abs(c);return a>=2*m?2:a>=m?1:0;
+}
+function mkNote(id,v,c,l,cfg){
+  const s=(c>=0?'+':'')+c.toFixed(2)+'%',up=c>0;
+  if(id==='vix')return (c>=cfg.vix_spike_pct?`VIX พุ่ง ${s} ในวันเดียว • `:'')+['ตลาดค่อนข้างนิ่ง ความกังวลต่ำ','ความกังวลของตลาดเริ่มสูงขึ้น หุ้นแม่ของ DR อาจแกว่งแรงขึ้น','ตลาดผันผวนสูง ราคาแกว่งแรงได้ทั้งสองทาง ระวังการลงทุนก้อนใหญ่รอบเดียว ลองพิจารณาการทยอยลงทุนและเงินสำรองให้เหมาะกับความเสี่ยงของตัวเอง'][l];
+  if(l===0)return {gold:'เคลื่อนไหวในกรอบปกติ',oil:'เคลื่อนไหวในกรอบปกติ',btc:'ซื้อขาย 24 ชม. ผันผวนสูงกว่าหุ้นทั่วไปเสมอ',usdthb:'ค่าเงินมีผลต่อ Fair Value ของ DR โดยตรง'}[id];
+  return {
+   gold:up?`ทอง ${s} ในวันเดียว มักเกิดเมื่อตลาดกังวลความเสี่ยงหรือดอลลาร์อ่อน (แนวโน้มทั่วไป ไม่ใช่กฎตายตัว)`:`ทอง ${s} มักสัมพันธ์กับดอลลาร์แข็งหรือดอกเบี้ยสูงขึ้น (แนวโน้มทั่วไป ไม่ใช่กฎตายตัว)`,
+   oil:up?`น้ำมัน ${s} กระทบต้นทุนหลายธุรกิจและหุ้นกลุ่มพลังงาน มักสะท้อนข่าวอุปทานหรือภูมิรัฐศาสตร์`:`น้ำมัน ${s} อาจสะท้อนความกังวลเรื่องเศรษฐกิจชะลอหรืออุปทานล้นตลาด`,
+   btc:`Bitcoin ${s} ในวันเดียว คริปโตแกว่งแรงได้ทั้งขึ้นและลง ควรลงทุนเท่าที่รับความเสี่ยงได้`,
+   usdthb:up?`บาทอ่อนลง ${s} ถ้าราคาหุ้นแม่คงที่ DR ที่อิงหุ้นต่างประเทศมักมีราคาเป็นบาทสูงขึ้น`:`บาทแข็งขึ้น ${s} ถ้าราคาหุ้นแม่คงที่ DR ที่อิงหุ้นต่างประเทศมักมีราคาเป็นบาทต่ำลง`}[id];
+}
+function spark(S,up){
+  if(S.length<2)return '';const mn=Math.min(...S),mx=Math.max(...S),r=(mx-mn)||1,W=80,H=24;
+  return `<svg viewBox="0 0 ${W} ${H}" class="h-6 w-full"><polyline fill="none" stroke="${up?'#34d399':'#fb7185'}" stroke-width="1.5" points="${S.map((v,i)=>(i/(S.length-1)*W).toFixed(1)+','+(H-2-(v-mn)/r*(H-4)).toFixed(1)).join(' ')}"/></svg>`;
+}
+let mkData=null,mkSel='';
+function mkView(it){const m=MK[it.id];if(!m)return null;const cfg=mkData.cfg||{},l=mkLevel(it.id,it.price,it.chgPct,cfg);return {m,l,note:mkNote(it.id,it.price,it.chgPct,l,cfg)}}
+function renderMarkets(){
+  if(!mkData)return;
+  $('mkGrid').innerHTML=mkData.items.map(it=>{const v=mkView(it);if(!v)return '';const up=it.chgPct>=0;
+   return `<button onclick="mkOpen('${it.id}')" class="rounded-2xl border ${it.id===mkSel?'border-emerald-400':'border-slate-800'} bg-slate-900/70 p-3 text-left transition active:scale-[.98]"><div class="flex items-center justify-between text-xs text-slate-400"><span>${v.m.ic} ${v.m.n}</span><span class="${LV[v.l][1]}">${LV[v.l][0]}</span></div><p class="mt-1 text-lg font-bold num">${v.m.f(it.price)}</p><p class="text-xs font-semibold num ${up?'text-emerald-400':'text-rose-400'}">${up?'+':''}${it.chgPct.toFixed(2)}%</p>${spark(it.series||[],up)}<p class="mt-1 line-clamp-2 text-[11px] leading-snug text-slate-400">${v.note}</p></button>`}).join('');
+  $('mkNote').textContent=`🕒 ดึงเมื่อ ${fmtT(mkData.fetchedMs)}${mkData.stale?' (ดึงใหม่ไม่สำเร็จ ใช้ข้อมูลล่าสุดที่เก็บไว้)':''} • อัปเดตทุกราว 15 นาที • ข้อมูลจาก Yahoo Finance อาจล่าช้า • ข้อความเป็นข้อสังเกตเชิงให้ความรู้ ไม่ใช่คำแนะนำลงทุน`;
+  if(mkSel)mkOpen(mkSel,true);
+}
+function mkOpen(id,keep){
+  const it=mkData&&mkData.items.find(x=>x.id===id),el=$('mkDetail');if(!it)return;
+  if(mkSel===id&&!keep){mkSel='';el.classList.add('hidden');renderMarkets();return}
+  mkSel=id;const v=mkView(it);if(!keep)renderMarkets();
+  el.innerHTML=`<b>${v.m.ic} ${v.m.n}</b> <span class="${LV[v.l][1]} text-xs">${LV[v.l][0]}</span><p class="mt-2">${v.note}</p><p class="mt-2 text-slate-400">📘 ${v.m.x}</p><p class="mt-2 text-[11px] text-slate-500">ราคา ณ ${it.t?fmtT(it.t):'-'} (เวลาที่ตลาดรายงานล่าสุด) • <a href="#guide/inv" class="text-emerald-400 underline">ดูคำอธิบายศัพท์ในคู่มือ</a></p>`;
+  el.classList.remove('hidden');
+}
+function loadMarkets(force){
+  try{const c=JSON.parse(localStorage.getItem('nexdr_mk_v1')||'null');if(c&&!force&&Date.now()-c.t<600000){mkData=c.d;renderMarkets();return}}catch(e){}
+  fetch(GAS_API_URL+'?markets=1',{credentials:'omit'}).then(r=>r.json()).then(d=>{if(!d.items||!d.items.length)throw 0;mkData=d;try{localStorage.setItem('nexdr_mk_v1',JSON.stringify({t:Date.now(),d}))}catch(e){}renderMarkets()})
+  .catch(()=>{if(!mkData)$('mkGrid').innerHTML='<p class="col-span-full py-4 text-sm text-slate-400">โหลดตัวชี้วัดไม่สำเร็จในตอนนี้ ลองรีเฟรชหน้านี้อีกครั้ง</p>'});
+}
+
 window.addEventListener('DOMContentLoaded',()=>{
-  route(); loadNews(); if(!localStorage.getItem(WEL_KEY))$('welcome').classList.remove('hidden');
+  route(); loadNews(); loadMarkets(); setInterval(()=>{if(!document.hidden&&(location.hash===''||location.hash==='#home'))loadMarkets(true)},900000); if(!localStorage.getItem(WEL_KEY))$('welcome').classList.remove('hidden');
   try{const c=JSON.parse(localStorage.getItem(CACHE_KEY)||'null');if(c&&c.items&&c.items.length)applyPayload(c,true)}catch(e){} // โชว์ข้อมูลเก่าทันทีระหว่างรอของใหม่
   loadData(false);
 });
